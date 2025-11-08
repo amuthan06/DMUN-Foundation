@@ -23,6 +23,7 @@ import Membership from "./pages/Membership";
 import Partner from "./pages/Partner";
 import Publications from "./pages/Publications";
 import DocumentsAssistant from "./pages/DocumentsAssistant";
+import ExecutivesPortal from "./pages/ExecutivesPortal";
 
 const GlobalStyle = createGlobalStyle`
   body, h1, h2, h3, h4, h5, h6, p, a, span, div, li, label, input, th, td {
@@ -79,6 +80,7 @@ function App() {
           <Route path="/test" element={<TestPage />} />
           <Route path="/partner" element={<Partner />} />
           <Route path="/documents-assistant" element={<DocumentsAssistant />} />
+          <Route path="/executives-login" element={<ExecutivesPortal />} />
         </Routes>
       </main>
       <Footer />

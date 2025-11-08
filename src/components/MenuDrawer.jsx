@@ -194,6 +194,7 @@ const menuGroups = [
       { label: "Newsroom", to: "/newsroom" },
       { label: "Publications", to: "/Publications" },
       { label: "Documents Assistant", to: "/documents-assistant" },
+      { label: "Executives Login", to: "/executives-login" },
     ],
   },
   {
