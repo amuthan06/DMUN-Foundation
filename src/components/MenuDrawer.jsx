@@ -193,6 +193,7 @@ const menuGroups = [
       { label: "Research", to: "/research" },
       { label: "Newsroom", to: "/newsroom" },
       { label: "Publications", to: "/Publications" },
+      { label: "Documents Assistant", to: "/documents-assistant" },
     ],
   },
   {

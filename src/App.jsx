@@ -1,27 +1,28 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import styled, { createGlobalStyle } from 'styled-components';
-import { useState } from 'react'
-import './App.css'
-import Header from './components/Header';
-import Footer from './components/Footer';
-import MenuDrawer from './components/MenuDrawer';
-import Home from './pages/Home';
-import About from './pages/About';
-import Advocacy from './pages/Advocacy';
-import Programs from './pages/Programs';
-import Research from './pages/Research';
-import Integrity from './pages/Integrity';
-import Mandate from './pages/Mandate';
-import TakeAction from './pages/TakeAction';
-import Newsroom from './pages/Newsroom';
-import ArticlePage from './pages/ArticlePage';
-import Donate from './pages/Donate';
-import DonorRelations from './pages/DonorRelations';
-import Volunteer from './pages/Volunteer';
-import TestPage from './pages/TestPage';
-import Membership from './pages/Membership';
-import Partner from './pages/Partner';
-import Publications from './pages/Publications';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import styled, { createGlobalStyle } from "styled-components";
+import { useState } from "react";
+import "./App.css";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import MenuDrawer from "./components/MenuDrawer";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Advocacy from "./pages/Advocacy";
+import Programs from "./pages/Programs";
+import Research from "./pages/Research";
+import Integrity from "./pages/Integrity";
+import Mandate from "./pages/Mandate";
+import TakeAction from "./pages/TakeAction";
+import Newsroom from "./pages/Newsroom";
+import ArticlePage from "./pages/ArticlePage";
+import Donate from "./pages/Donate";
+import DonorRelations from "./pages/DonorRelations";
+import Volunteer from "./pages/Volunteer";
+import TestPage from "./pages/TestPage";
+import Membership from "./pages/Membership";
+import Partner from "./pages/Partner";
+import Publications from "./pages/Publications";
+import DocumentsAssistant from "./pages/DocumentsAssistant";
 
 const GlobalStyle = createGlobalStyle`
   body, h1, h2, h3, h4, h5, h6, p, a, span, div, li, label, input, th, td {
@@ -59,7 +60,10 @@ function App() {
           {/* <Route path="/programs/global-education" element={<Programs />} /> */}
           <Route path="/research" element={<Research />} />
           <Route path="/Publications" element={<Publications />} />
-          <Route path="/Membership" element={<Membership menuOpen={menuOpen} />} />
+          <Route
+            path="/Membership"
+            element={<Membership menuOpen={menuOpen} />}
+          />
           {/* Removed specific subnav routes for Research */}
           {/* <Route path="/research/publications" element={<Research />} /> */}
           {/* <Route path="/research/projects" element={<Research />} /> */}
@@ -74,12 +78,12 @@ function App() {
           <Route path="/volunteer" element={<Volunteer />} />
           <Route path="/test" element={<TestPage />} />
           <Route path="/partner" element={<Partner />} />
+          <Route path="/documents-assistant" element={<DocumentsAssistant />} />
         </Routes>
       </main>
       <Footer />
     </Router>
-  )
+  );
 }
 
-export default App
-
+export default App;
