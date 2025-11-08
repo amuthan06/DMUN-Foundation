@@ -11,9 +11,10 @@
   },
   "dependencies": {
     "framer-motion": "^12.18.1",
+    "gsap": "^3.13.0",
     "mammoth": "^1.6.0",
     "pdfjs-dist": "^4.10.38",
-    "gsap": "^3.13.0",
+    "prop-types": "^15.8.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",

@@ -24,6 +24,7 @@ import Partner from "./pages/Partner";
 import Publications from "./pages/Publications";
 import DocumentsAssistant from "./pages/DocumentsAssistant";
 import ExecutivesPortal from "./pages/ExecutivesPortal";
+import NotFound from "./pages/NotFound";
 
 const GlobalStyle = createGlobalStyle`
   body, h1, h2, h3, h4, h5, h6, p, a, span, div, li, label, input, th, td {
@@ -50,25 +51,13 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/advocacy" element={<Advocacy />} />
-          {/* Removed specific subnav routes for Advocacy */}
-          {/* <Route path="/advocacy/education" element={<Advocacy />} /> */}
-          {/* <Route path="/advocacy/environment" element={<Advocacy />} /> */}
-          {/* <Route path="/advocacy/social-justice" element={<Advocacy />} /> */}
           <Route path="/programs" element={<Programs />} />
-          {/* Removed specific subnav routes for Programs */}
-          {/* <Route path="/programs/youth-leadership" element={<Programs />} /> */}
-          {/* <Route path="/programs/community-service" element={<Programs />} /> */}
-          {/* <Route path="/programs/global-education" element={<Programs />} /> */}
           <Route path="/research" element={<Research />} />
           <Route path="/Publications" element={<Publications />} />
           <Route
             path="/Membership"
             element={<Membership menuOpen={menuOpen} />}
           />
-          {/* Removed specific subnav routes for Research */}
-          {/* <Route path="/research/publications" element={<Research />} /> */}
-          {/* <Route path="/research/projects" element={<Research />} /> */}
-          {/* <Route path="/research/partners" element={<Research />} /> */}
           <Route path="/integrity" element={<Integrity />} />
           <Route path="/mandate" element={<Mandate />} />
           <Route path="/take-action" element={<TakeAction />} />
@@ -81,6 +70,7 @@ function App() {
           <Route path="/partner" element={<Partner />} />
           <Route path="/documents-assistant" element={<DocumentsAssistant />} />
           <Route path="/executives-login" element={<ExecutivesPortal />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />
