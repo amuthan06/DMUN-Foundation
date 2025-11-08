@@ -16,7 +16,7 @@ const Card = styled(motion.article)`
 const Photo = styled.div`
   position: relative;
   width: 100%;
-  padding-top: 68%;
+  padding-top: 60%;
   background: rgba(68, 184, 243, 0.12);
   img {
     position: absolute;

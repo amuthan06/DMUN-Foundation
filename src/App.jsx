@@ -25,6 +25,7 @@ import Publications from "./pages/Publications";
 import DocumentsAssistant from "./pages/DocumentsAssistant";
 import ExecutivesPortal from "./pages/ExecutivesPortal";
 import NotFound from "./pages/NotFound";
+import ExecutiveLeadership from "./pages/ExecutiveLeadership";
 
 const GlobalStyle = createGlobalStyle`
   body, h1, h2, h3, h4, h5, h6, p, a, span, div, li, label, input, th, td {
@@ -70,6 +71,7 @@ function App() {
           <Route path="/partner" element={<Partner />} />
           <Route path="/documents-assistant" element={<DocumentsAssistant />} />
           <Route path="/executives-login" element={<ExecutivesPortal />} />
+          <Route path="/leadership" element={<ExecutiveLeadership />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

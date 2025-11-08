@@ -210,6 +210,7 @@ const Header = ({ onMenuClick }) => {
           <NavLink to="/programs">Programs</NavLink>
           <NavLink to="/advocacy">Advocacy</NavLink>
           <NavLink to="/research">Research</NavLink>
+          <NavLink to="/leadership">Leadership</NavLink>
           <NavLink to="/newsroom">Newsroom</NavLink>
         </Navigation>
 

@@ -7,26 +7,27 @@ import { leadershipTeam } from "../data/leadership";
 const PageWrapper = styled.div`
   background: var(--andover-light-blue);
   min-height: 100vh;
-  padding: clamp(1.8rem, 4vw, 3.5rem) clamp(1.3rem, 5vw, 5rem);
+  padding: clamp(1.4rem, 4vw, 2.8rem) clamp(1.4rem, 5vw, 5rem);
   box-sizing: border-box;
   color: var(--andover-dark-blue);
   font-family: var(--andover-font-sans);
   display: flex;
   flex-direction: column;
-  gap: clamp(1.4rem, 2.2vw, 2.3rem);
+  gap: clamp(1.2rem, 2.2vw, 2.4rem);
 `;
 
 const IntroSection = styled.section`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: clamp(0.8rem, 1.8vw, 1.6rem);
-  align-items: flex-start;
+  gap: clamp(0.8rem, 2vw, 1.6rem);
+  align-items: stretch;
+  margin-top: 0.4rem;
 `;
 
 const IntroText = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 `;
 
 const Heading = styled.h1`
@@ -34,23 +35,51 @@ const Heading = styled.h1`
   font-family: var(--andover-font-serif);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: clamp(1.85rem, 3vw, 2.4rem);
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
 `;
 
 const Mission = styled.p`
   margin: 0;
   font-size: 0.96rem;
-  line-height: 1.55;
+  line-height: 1.6;
   max-width: 720px;
+`;
+
+const ValuesCard = styled.div`
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  padding: clamp(1.2rem, 2.4vw, 2rem);
+  box-shadow: 0 20px 42px rgba(0, 33, 71, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const ValuesTitle = styled.span`
+  font-family: var(--andover-font-serif);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+`;
+
+const ValueList = styled.ul`
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
 `;
 
 const QuoteCard = styled.div`
   background: rgba(68, 184, 243, 0.16);
   border-radius: 24px;
-  padding: clamp(0.9rem, 2vw, 1.4rem);
-  box-shadow: 0 18px 38px rgba(0, 33, 71, 0.12);
+  padding: clamp(0.85rem, 1.8vw, 1.4rem);
+  box-shadow: 0 16px 32px rgba(0, 33, 71, 0.12);
   font-family: var(--andover-font-serif);
-  font-size: 0.96rem;
+  font-size: 0.95rem;
   line-height: 1.55;
   position: relative;
   overflow: hidden;
@@ -59,9 +88,9 @@ const QuoteCard = styled.div`
 
 const QuoteAttribution = styled.span`
   display: block;
-  margin-top: 0.5rem;
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
+  margin-top: 0.65rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 `;
 
@@ -71,7 +100,6 @@ const ControlsRow = styled.div`
   gap: 0.75rem;
   align-items: center;
   justify-content: space-between;
-  margin-top: -0.3rem;
 `;
 
 const FilterGroup = styled.div`
@@ -107,7 +135,7 @@ const LeadershipGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 320px));
   justify-content: center;
-  gap: clamp(1.4rem, 2.6vw, 2rem);
+  gap: clamp(1.4rem, 2vw, 1.6rem);
   align-items: stretch;
 `;
 
