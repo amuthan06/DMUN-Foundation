@@ -1,7 +1,8 @@
 import styled from "styled-components";
-import { Link, useLocation } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import React from "react";
 import SearchBar from "./search/SearchBar";
+import { useRuleContext } from "../context/RuleContext";
 
 const DARK_BLUE = "#002147";
 const ABBOT_BLUE = "#44b8f3";
@@ -37,8 +38,8 @@ const MenuGlyph = () => (
 );
 
 const HeaderBar = styled.header`
-  background: ${(props) => (props.$transparent ? "transparent" : ABBOT_BLUE)};
-  color: ${(props) => (props.$transparent ? "#fff" : "var(--andover-accent)")};
+  background: ${ABBOT_BLUE};
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -102,38 +103,54 @@ const Right = styled.div`
   gap: 1.2rem;
 `;
 
+const PersonaSelect = styled.select`
+  border: 1px solid rgba(0, 33, 71, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  color: #002147;
+  font-size: 0.85rem;
+  font-family: var(--andover-font-sans);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #ffffff;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(68, 184, 243, 0.4);
+    outline-offset: 2px;
+  }
+
+  option {
+    color: #002147;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const PersonaLabel = styled.span`
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  font-family: var(--andover-font-sans);
+  color: rgba(255, 255, 255, 0.9);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
 const Header = ({ onMenuClick }) => {
-  const location = useLocation();
-  const [isTransparent, setIsTransparent] = useState(true);
-
-  const isHome = location.pathname === "/";
-
-  useEffect(() => {
-    if (!isHome) {
-      setIsTransparent(false);
-      return;
-    }
-
-    const heroEl = document.querySelector(".dmun-hero-section"); // your actual hero wrapper
-    const heroHeight = heroEl ? heroEl.offsetHeight : 0;
-
-    const handleScroll = () => {
-      if (window.scrollY >= heroHeight) {
-        setIsTransparent(false); // Abbott blue after hero ends
-      } else {
-        setIsTransparent(true); // transparent while over hero
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // run once on mount
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isHome]);
+  const { userType, setUserType, userTypes } = useRuleContext();
 
   return (
     <>
-      <HeaderBar $transparent={isHome && isTransparent}>
+      <HeaderBar>
         <StyledLink to="/">
           <Logo src="/dmun-white-logo.png" alt="DMUN Foundation Logo" />
         </StyledLink>
@@ -148,6 +165,18 @@ const Header = ({ onMenuClick }) => {
         </Navigation>
 
         <Right>
+          <PersonaLabel>Viewing as</PersonaLabel>
+          <PersonaSelect
+            value={userType}
+            onChange={(event) => setUserType(event.target.value)}
+            aria-label="Select audience type"
+          >
+            {userTypes.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </PersonaSelect>
           <SearchBar />
           <NavLink
             as="button"

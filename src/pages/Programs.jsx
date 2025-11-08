@@ -1,17 +1,18 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import styled, { keyframes } from 'styled-components';
+import React, { useMemo } from "react";
+import { Link } from "react-router-dom";
+import styled, { keyframes } from "styled-components";
+import { usePersonalizedContent } from "../context/RuleContext";
 
-const ABBOT_BLUE = '#44b8f3';
-const DARK_BLUE = '#002147';
-const LIGHT_BLUE = '#97e1e6';
+const ABBOT_BLUE = "#44b8f3";
+const DARK_BLUE = "#002147";
+const LIGHT_BLUE = "#97e1e6";
 
 // New color for the main page background
-const PAGE_BACKGROUND_COLOR = '#E7F1FA';
+const PAGE_BACKGROUND_COLOR = "#E7F1FA";
 
 // New colors for subnavigation section
-const SUBNAV_GRAY_TEXT = '#555'; // Slightly darker gray for text
-const SUBNAV_YELLOW_ICON = '#FFD700'; // A golden yellow for the icon
+const SUBNAV_GRAY_TEXT = "#555"; // Slightly darker gray for text
+const SUBNAV_YELLOW_ICON = "#FFD700"; // A golden yellow for the icon
 
 const AboutHeroWrapper = styled.section`
   position: relative;
@@ -21,7 +22,7 @@ const AboutHeroWrapper = styled.section`
   margin-left: -50vw;
   margin-right: -50vw;
   height: 350px;
-  background: url('/ProgramPageHeader.jpeg') center/cover no-repeat;
+  background: url("/ProgramPageHeader.jpeg") center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -30,8 +31,11 @@ const AboutHeroWrapper = styled.section`
   &::before {
     content: " ";
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(0,0,0,0.4);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
     z-index: 2;
   }
   @media (max-width: 768px) {
@@ -47,7 +51,7 @@ const AboutHeroText = styled.h1`
   position: relative;
   z-index: 3;
   color: #fff !important;
-  font-size: 4vw;
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
   font-family: var(--andover-font-serif);
   font-weight: 400;
   letter-spacing: 0.01em;
@@ -61,6 +65,46 @@ const AboutHeroText = styled.h1`
     padding-right: 1rem;
     text-align: center;
     word-break: break-word;
+  }
+`;
+
+const HeroContent = styled.div`
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.8rem, 2vw, 1.6rem);
+  text-align: center;
+  padding: 0 3vw;
+`;
+
+const HeroSubtitle = styled.p`
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(1rem, 2vw, 1.45rem);
+  line-height: 1.6;
+  max-width: 720px;
+`;
+
+const HeroCTAButton = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.6rem;
+  border-radius: 999px;
+  background: var(--andover-blue);
+  color: #002147;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-family: var(--andover-font-serif);
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
   }
 `;
 
@@ -120,6 +164,24 @@ const SubnavHeading = styled.h2`
   @media (max-width: 768px) {
     font-size: 1.8rem;
     margin-bottom: 0.5rem;
+  }
+`;
+
+const PersonaCallout = styled.div`
+  align-self: stretch;
+  background: rgba(68, 184, 243, 0.12);
+  border: 1px solid rgba(68, 184, 243, 0.4);
+  border-radius: 20px;
+  padding: 1.2rem 1.6rem;
+  margin-bottom: 1.6rem;
+  color: ${DARK_BLUE};
+  font-size: 1rem;
+  line-height: 1.6;
+  font-family: var(--andover-font-sans);
+  text-align: left;
+
+  @media (max-width: 768px) {
+    text-align: center;
   }
 `;
 
@@ -286,7 +348,7 @@ const LeadershipSection = styled.section`
   background: ${DARK_BLUE};
   color: ${LIGHT_BLUE} !important;
   padding: 4rem 0 2.5rem 0;
-  animation: ${fadeIn} 0.8s cubic-bezier(0.4,0,0.2,1);
+  animation: ${fadeIn} 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
   padding-left: 0;
   padding-right: 0;
@@ -376,7 +438,7 @@ const LeadershipCardsRow = styled.div`
   align-items: flex-start;
   gap: 3.5rem;
   margin-bottom: 2.5rem;
-  animation: ${fadeIn} 1.2s cubic-bezier(0.4,0,0.2,1);
+  animation: ${fadeIn} 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   max-width: 1100px;
   margin-left: auto;
   margin-right: auto;
@@ -408,9 +470,11 @@ const LeaderImg = styled.div`
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: #6c7a89 url('https://via.placeholder.com/120x120?text=Photo') center/cover no-repeat;
+  background: #6c7a89 url("https://via.placeholder.com/120x120?text=Photo")
+    center/cover no-repeat;
   margin-bottom: 1.2rem;
-  filter: ${({ $isColor }) => ($isColor ? 'none' : 'grayscale(1) contrast(1.1)')};
+  filter: ${({ $isColor }) =>
+    $isColor ? "none" : "grayscale(1) contrast(1.1)"};
   border: none; /* Ensure no border on LeaderImg */
   @media (max-width: 768px) {
     width: 100px;
@@ -471,14 +535,34 @@ const LeaderLink = styled.a`
 `;
 
 const ArrowIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 14" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="butt" strokeLinejoin="miter">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 14"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="4"
+    strokeLinecap="butt"
+    strokeLinejoin="miter"
+  >
     <polyline points="2 2 12 12 22 2"></polyline>
   </svg>
 );
 
 const BuildingIconSVG = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M3 21H21M3 21V7L10 3V21M3 21H10M10 21V11H14V21M10 21H14M14 21H21V11L14 7V21Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M3 21H21M3 21V7L10 3V21M3 21H10M10 21V11H14V21M10 21H14M14 21H21V11L14 7V21Z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
@@ -502,22 +586,80 @@ const ProgramGallery = styled.div`
 `;
 
 const Programs = () => {
+  const defaultContent = useMemo(
+    () => ({
+      heroTitle: "Programs that Transform Potential into Purpose",
+      heroSubtitle:
+        "DMUN delivers free, high-impact learning experiences that cultivate diplomacy, leadership, and global citizenship.",
+      heroCta: { text: "View Program Catalog", link: "/programs#catalog" },
+      callout:
+        "Our initiatives are accessible globally and designed for every learner.",
+    }),
+    []
+  );
+
+  const programsContent = usePersonalizedContent("programs", defaultContent);
+  const heroCta = programsContent.heroCta || defaultContent.heroCta;
+
   return (
     <>
       <AboutHeroWrapper>
-        <AboutHeroText>Programs</AboutHeroText>
+        <HeroContent>
+          <AboutHeroText>
+            {programsContent.heroTitle || defaultContent.heroTitle}
+          </AboutHeroText>
+          {programsContent.heroSubtitle && (
+            <HeroSubtitle>{programsContent.heroSubtitle}</HeroSubtitle>
+          )}
+          {heroCta?.text && (
+            <HeroCTAButton
+              as={heroCta.link?.startsWith("http") ? "a" : Link}
+              to={
+                heroCta.link?.startsWith("http")
+                  ? undefined
+                  : heroCta.link || "/programs#catalog"
+              }
+              href={heroCta.link?.startsWith("http") ? heroCta.link : undefined}
+            >
+              {heroCta.text}
+            </HeroCTAButton>
+          )}
+        </HeroContent>
       </AboutHeroWrapper>
       <SubnavSection>
         <SubnavContentWrapper>
+          {programsContent.callout && (
+            <PersonaCallout>{programsContent.callout}</PersonaCallout>
+          )}
           <YellowIconGraphic>
             <BuildingIconSVG />
           </YellowIconGraphic>
           <SubnavHeading>PROGRAMS</SubnavHeading>
           <SubnavLinksContainer>
-            <SubnavLink href="#model-un-workshops">What Makes Us Unique <CaretIcon><ArrowIcon /></CaretIcon></SubnavLink>
-            <SubnavLink href="#leadership-training">Unbiased & Independent <CaretIcon><ArrowIcon /></CaretIcon></SubnavLink>
-            <SubnavLink href="#seminars">Seminars <CaretIcon><ArrowIcon /></CaretIcon></SubnavLink>
-            <SubnavLink href="#community-projects">Community Projects <CaretIcon><ArrowIcon /></CaretIcon></SubnavLink>
+            <SubnavLink href="#model-un-workshops">
+              What Makes Us Unique{" "}
+              <CaretIcon>
+                <ArrowIcon />
+              </CaretIcon>
+            </SubnavLink>
+            <SubnavLink href="#leadership-training">
+              Unbiased & Independent{" "}
+              <CaretIcon>
+                <ArrowIcon />
+              </CaretIcon>
+            </SubnavLink>
+            <SubnavLink href="#seminars">
+              Seminars{" "}
+              <CaretIcon>
+                <ArrowIcon />
+              </CaretIcon>
+            </SubnavLink>
+            <SubnavLink href="#community-projects">
+              Community Projects{" "}
+              <CaretIcon>
+                <ArrowIcon />
+              </CaretIcon>
+            </SubnavLink>
           </SubnavLinksContainer>
         </SubnavContentWrapper>
       </SubnavSection>
@@ -526,27 +668,77 @@ const Programs = () => {
           <Left>
             <SectionTitle>Our Programs</SectionTitle>
             <p>
-              DMUN offers a diverse range of programs designed to empower youth with the skills and knowledge needed to become effective global leaders. Our initiatives focus on interactive learning, practical application, and fostering a deep understanding of international relations.
+              DMUN offers a diverse range of programs designed to empower youth
+              with the skills and knowledge needed to become effective global
+              leaders. Our initiatives focus on interactive learning, practical
+              application, and fostering a deep understanding of international
+              relations.
             </p>
             <p>
-              We are committed to providing accessible and high-quality educational experiences that prepare young individuals for meaningful engagement in the world.
+              We are committed to providing accessible and high-quality
+              educational experiences that prepare young individuals for
+              meaningful engagement in the world.
             </p>
 
-            <SectionTitle id="model-un-workshops">What Makes Our Programs Unique</SectionTitle>
-            <ul style={{ marginBottom: '2rem', marginTop: '0.5rem' }}>
-              <li><strong>Academic Excellence:</strong> We prioritize academic excellence by providing meticulously crafted programs that challenge and inspire students to excel. Our programs are designed to be approachable for all, while allowing for rigorous academic inquiry.</li>
-              <li><strong>Global and Inclusive:</strong> Our programs are accessible to everyone, regardless of socioeconomic background, ensuring that diverse voices are heard and valued. We foster a rich, multicultural environment that promotes cross-cultural understanding.</li>
-              <li><strong>Real Impact:</strong> The discussions and outcomes of each program are infused into real-world impact, through our engagement in multilateral bodies and institutions, allowing for tangible impact.</li>
-              <li><strong>Continued Growth:</strong> Beyond the initial conference experience, we offer a range of follow-up programs, resources, and opportunities designed to support continued learning and growth. Our alumni network provides a platform for former participants to stay connected, share experiences, and collaborate on initiatives.</li>
+            <SectionTitle id="model-un-workshops">
+              What Makes Our Programs Unique
+            </SectionTitle>
+            <ul style={{ marginBottom: "2rem", marginTop: "0.5rem" }}>
+              <li>
+                <strong>Academic Excellence:</strong> We prioritize academic
+                excellence by providing meticulously crafted programs that
+                challenge and inspire students to excel. Our programs are
+                designed to be approachable for all, while allowing for rigorous
+                academic inquiry.
+              </li>
+              <li>
+                <strong>Global and Inclusive:</strong> Our programs are
+                accessible to everyone, regardless of socioeconomic background,
+                ensuring that diverse voices are heard and valued. We foster a
+                rich, multicultural environment that promotes cross-cultural
+                understanding.
+              </li>
+              <li>
+                <strong>Real Impact:</strong> The discussions and outcomes of
+                each program are infused into real-world impact, through our
+                engagement in multilateral bodies and institutions, allowing for
+                tangible impact.
+              </li>
+              <li>
+                <strong>Continued Growth:</strong> Beyond the initial conference
+                experience, we offer a range of follow-up programs, resources,
+                and opportunities designed to support continued learning and
+                growth. Our alumni network provides a platform for former
+                participants to stay connected, share experiences, and
+                collaborate on initiatives.
+              </li>
             </ul>
 
-            <SectionTitle id="leadership-training">Unbiased & Independent</SectionTitle>
-            <ul style={{ marginBottom: '2rem', marginTop: '0.5rem' }}>
-              <li>Our strict policies on our education programs ensures that our decisions and actions are driven solely by our mission to empower young leaders and foster global understanding.</li>
-              <li>We do not receive funding from any national government or intergovernmental organization.</li>
-              <li>No donor can influence the educational materials provided to participants in our program.</li>
-              <li>Our programs are developed under an independent group of subject matter experts nominated by our members.</li>
-              <li>All of our programs are evaluated by an independent members at an annual basis to confirm program integrity.</li>
+            <SectionTitle id="leadership-training">
+              Unbiased & Independent
+            </SectionTitle>
+            <ul style={{ marginBottom: "2rem", marginTop: "0.5rem" }}>
+              <li>
+                Our strict policies on our education programs ensures that our
+                decisions and actions are driven solely by our mission to
+                empower young leaders and foster global understanding.
+              </li>
+              <li>
+                We do not receive funding from any national government or
+                intergovernmental organization.
+              </li>
+              <li>
+                No donor can influence the educational materials provided to
+                participants in our program.
+              </li>
+              <li>
+                Our programs are developed under an independent group of subject
+                matter experts nominated by our members.
+              </li>
+              <li>
+                All of our programs are evaluated by an independent members at
+                an annual basis to confirm program integrity.
+              </li>
             </ul>
 
             <ProgramGallery>
@@ -563,56 +755,56 @@ const Programs = () => {
                 "https://mymun.com/conferences/dmun-crisis-2025",
                 "https://mymun.com/conferences/dmun-model-african-union-2025",
                 "https://mymun.com/conferences/dmunsf-2025",
-                "https://mymun.com/conferences/khni-dmun-youth-inputs-i-2025"
+                "https://mymun.com/conferences/khni-dmun-youth-inputs-i-2025",
               ].map((link, i) => {
                 const imgNum = i + 1;
-                const ext = imgNum <= 5 ? 'jpeg' : 'png';
+                const ext = imgNum <= 5 ? "jpeg" : "png";
                 return (
                   <div
                     key={i}
                     style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      background: '#fff',
-                      borderRadius: '18px',
-                      boxShadow: '0 4px 16px #0001',
-                      padding: '2rem 1rem',
-                      width: '100%',
-                      maxWidth: '320px'
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      background: "#fff",
+                      borderRadius: "18px",
+                      boxShadow: "0 4px 16px #0001",
+                      padding: "2rem 1rem",
+                      width: "100%",
+                      maxWidth: "320px",
                     }}
                   >
                     <img
                       src={`/Logo${imgNum}.${ext}`}
                       alt={`Program Logo ${imgNum}`}
                       style={{
-                        width: '200px',
-                        height: '200px',
-                        objectFit: 'contain',
-                        marginBottom: '1.5rem',
-                        borderRadius: '16px',
-                        background: '#f7f7f7',
-                        boxShadow: '0 2px 8px #0001'
+                        width: "200px",
+                        height: "200px",
+                        objectFit: "contain",
+                        marginBottom: "1.5rem",
+                        borderRadius: "16px",
+                        background: "#f7f7f7",
+                        boxShadow: "0 2px 8px #0001",
                       }}
                     />
                     <a
                       href={link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ textDecoration: 'none', width: '100%' }}
+                      style={{ textDecoration: "none", width: "100%" }}
                     >
                       <button
                         style={{
-                          background: '#44b8f3',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '8px',
-                          padding: '0.9rem 0',
+                          background: "#44b8f3",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "8px",
+                          padding: "0.9rem 0",
                           fontWeight: 700,
-                          fontFamily: 'var(--andover-font-sans)',
-                          cursor: 'pointer',
-                          fontSize: '1.15rem',
-                          width: '100%'
+                          fontFamily: "var(--andover-font-sans)",
+                          cursor: "pointer",
+                          fontSize: "1.15rem",
+                          width: "100%",
                         }}
                       >
                         Register
@@ -624,9 +816,7 @@ const Programs = () => {
             </ProgramGallery>
 
             <SectionTitle>Program Categories</SectionTitle>
-            <p>
-              Our programs are broadly categorized into:
-            </p>
+            <p>Our programs are broadly categorized into:</p>
             <ul>
               <li>Model UN Simulation & Training</li>
               <li>Youth Leadership & Development</li>
@@ -636,17 +826,31 @@ const Programs = () => {
             </ul>
             <SectionTitle>Program Benefits</SectionTitle>
             <p>
-              Participating in DMUN programs offers numerous benefits, including:
+              Participating in DMUN programs offers numerous benefits,
+              including:
             </p>
             <p>
-              <li>Global collaboration with delegates from diverse regions and backgrounds.</li>
-              <li>Enhancement of public speaking, negotiation, and leadership skills.</li>
-              <li>Engagement in real-time debate on current global challenges.</li>
+              <li>
+                Global collaboration with delegates from diverse regions and
+                backgrounds.
+              </li>
+              <li>
+                Enhancement of public speaking, negotiation, and leadership
+                skills.
+              </li>
+              <li>
+                Engagement in real-time debate on current global challenges.
+              </li>
               <li>Flexible participation from anywhere at minimal cost.</li>
-              <li>Access to expert mentorship and valuable recognition through certifications.</li>
+              <li>
+                Access to expert mentorship and valuable recognition through
+                certifications.
+              </li>
             </p>
             <p>
-              <a href="https://mymun.com/dmun"><button >Register Now</button></a>
+              <a href="https://mymun.com/dmun">
+                <button>Register Now</button>
+              </a>
             </p>
           </Left>
         </Main>
@@ -656,6 +860,3 @@ const Programs = () => {
 };
 
 export default Programs;
-          
-            
-        

@@ -27,7 +27,9 @@ import ExecutivesPortal from "./pages/ExecutivesPortal";
 import NotFound from "./pages/NotFound";
 import ExecutiveLeadership from "./pages/ExecutiveLeadership";
 import SearchResults from "./pages/SearchResults";
+import RuleManagement from "./pages/RuleManagement";
 import { SearchProvider } from "./context/SearchContext";
+import { RuleProvider } from "./context/RuleContext";
 
 const GlobalStyle = createGlobalStyle`
   body, h1, h2, h3, h4, h5, h6, p, a, span, div, li, label, input, th, td {
@@ -47,42 +49,45 @@ function App() {
   return (
     <Router>
       <SearchProvider>
-        <GlobalStyle />
-        {!menuOpen && <Header onMenuClick={() => setMenuOpen(true)} />}
-        <MenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/advocacy" element={<Advocacy />} />
-            <Route path="/programs" element={<Programs />} />
-            <Route path="/research" element={<Research />} />
-            <Route path="/Publications" element={<Publications />} />
-            <Route
-              path="/Membership"
-              element={<Membership menuOpen={menuOpen} />}
-            />
-            <Route path="/integrity" element={<Integrity />} />
-            <Route path="/mandate" element={<Mandate />} />
-            <Route path="/take-action" element={<TakeAction />} />
-            <Route path="/newsroom" element={<Newsroom />} />
-            <Route path="/newsroom/:id" element={<ArticlePage />} />
-            <Route path="/donate" element={<Donate />} />
-            <Route path="/donor-relations" element={<DonorRelations />} />
-            <Route path="/volunteer" element={<Volunteer />} />
-            <Route path="/test" element={<TestPage />} />
-            <Route path="/partner" element={<Partner />} />
-            <Route
-              path="/documents-assistant"
-              element={<DocumentsAssistant />}
-            />
-            <Route path="/executives-login" element={<ExecutivesPortal />} />
-            <Route path="/leadership" element={<ExecutiveLeadership />} />
-            <Route path="/search" element={<SearchResults />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-        <Footer />
+        <RuleProvider>
+          <GlobalStyle />
+          {!menuOpen && <Header onMenuClick={() => setMenuOpen(true)} />}
+          <MenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/advocacy" element={<Advocacy />} />
+              <Route path="/programs" element={<Programs />} />
+              <Route path="/research" element={<Research />} />
+              <Route path="/Publications" element={<Publications />} />
+              <Route
+                path="/Membership"
+                element={<Membership menuOpen={menuOpen} />}
+              />
+              <Route path="/integrity" element={<Integrity />} />
+              <Route path="/mandate" element={<Mandate />} />
+              <Route path="/take-action" element={<TakeAction />} />
+              <Route path="/newsroom" element={<Newsroom />} />
+              <Route path="/newsroom/:id" element={<ArticlePage />} />
+              <Route path="/donate" element={<Donate />} />
+              <Route path="/donor-relations" element={<DonorRelations />} />
+              <Route path="/volunteer" element={<Volunteer />} />
+              <Route path="/test" element={<TestPage />} />
+              <Route path="/partner" element={<Partner />} />
+              <Route
+                path="/documents-assistant"
+                element={<DocumentsAssistant />}
+              />
+              <Route path="/executives-login" element={<ExecutivesPortal />} />
+              <Route path="/leadership" element={<ExecutiveLeadership />} />
+              <Route path="/search" element={<SearchResults />} />
+              <Route path="/rule-management" element={<RuleManagement />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          <Footer />
+        </RuleProvider>
       </SearchProvider>
     </Router>
   );

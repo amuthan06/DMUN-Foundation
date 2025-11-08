@@ -1,13 +1,14 @@
-import styled from 'styled-components';
-import TiltedCard from '../components/TiltedCard';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import SplitText from '../components/SplitText';
-import { Link } from 'react-router-dom';
+import styled from "styled-components";
+import TiltedCard from "../components/TiltedCard";
+import { motion } from "framer-motion";
+import { useMemo, useState } from "react";
+import SplitText from "../components/SplitText";
+import { Link } from "react-router-dom";
+import { usePersonalizedContent } from "../context/RuleContext";
 
-const ABBOT_BLUE = '#44b8f3'; // The new primary color
-const DARK_BLUE = '#002147'; // Keeping for high contrast on light backgrounds
-const LIGHT_BLUE = '#97e1e6'; // Assuming a light blue color for the filled part or other accents
+const ABBOT_BLUE = "#44b8f3"; // The new primary color
+const DARK_BLUE = "#002147"; // Keeping for high contrast on light backgrounds
+const LIGHT_BLUE = "#97e1e6"; // Assuming a light blue color for the filled part or other accents
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 50 },
@@ -18,9 +19,9 @@ const sectionVariants = {
       duration: 0.4, // Even faster duration for section entry
       ease: "easeOut",
       when: "beforeChildren",
-      staggerChildren: 0.05 // Even smaller stagger for children
-    }
-  }
+      staggerChildren: 0.05, // Even smaller stagger for children
+    },
+  },
 };
 
 const itemVariants = {
@@ -30,9 +31,9 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.3, // Even faster duration for individual items
-      ease: "easeOut"
-    }
-  }
+      ease: "easeOut",
+    },
+  },
 };
 
 // Main content frame with refined structure
@@ -72,7 +73,7 @@ const HeroWrapper = styled.section`
   height: calc(100vh + 70px);
   min-height: calc(100vh + 70px);
   margin-top: -70px;
-  background: url('/hero-home.jpeg') center/cover no-repeat;
+  background: url("/hero-home.jpeg") center/cover no-repeat;
   background-size: cover;
   display: flex;
   align-items: center;
@@ -85,7 +86,10 @@ const HeroWrapper = styled.section`
   &::before {
     content: "";
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 2;
     pointer-events: none;
@@ -105,10 +109,87 @@ const HeroWrapper = styled.section`
     background-position: center center;
     background-size: cover;
     text-align: center;
-    h1, h2, h3, h4, h5, h6, p, span, div {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    div {
       text-align: center !important;
       word-break: break-word;
     }
+  }
+`;
+
+const HeroContent = styled.div`
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.4rem, 2.6vw, 2.4rem);
+  text-align: center;
+`;
+
+const HeroSubtitle = styled.p`
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(1.05rem, 2.2vw, 1.6rem);
+  line-height: 1.6;
+  max-width: 720px;
+`;
+
+const HeroButtons = styled.div`
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.9rem;
+`;
+
+const HeroButton = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.9rem;
+  border-radius: 999px;
+  font-family: var(--andover-font-serif);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: ${({ $secondary }) =>
+    $secondary ? "rgba(255, 255, 255, 0.18)" : "var(--andover-blue)"};
+  color: ${({ $secondary }) => ($secondary ? "#fff" : "#002147")};
+  border: ${({ $secondary }) =>
+    $secondary ? "1px solid rgba(255, 255, 255, 0.4)" : "none"};
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+  }
+`;
+
+const HeroPromo = styled(Link)`
+  margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1.2rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 16px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.22);
   }
 `;
 
@@ -117,7 +198,8 @@ const StatsSection = styled.section`
   padding: 2rem;
   background: white;
   border-radius: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   position: relative;
   overflow: hidden;
   display: grid;
@@ -145,8 +227,8 @@ const StatBox = styled.div`
   font-family: var(--andover-font-serif);
   color: ${DARK_BLUE};
   text-align: center;
-  grid-column: ${props => props.gridColumn || 'span 3'};
-  grid-row: ${props => props.gridRow || 'auto'};
+  grid-column: ${(props) => props.gridColumn || "span 3"};
+  grid-row: ${(props) => props.gridRow || "auto"};
 
   @media (max-width: 768px) {
     grid-column: span 3;
@@ -163,14 +245,13 @@ const StatBox = styled.div`
     padding: 0.7rem 0.2rem;
     font-size: 0.98rem;
     min-width: 0;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     &:last-child {
       border-bottom: none;
       margin-bottom: 0;
     }
   }
 `;
-
 
 const StatIcon = styled.div`
   font-size: 3rem;
@@ -183,7 +264,7 @@ const StatNumber = styled.div`
   font-weight: 700;
   margin-bottom: 0.4rem;
   color: ${DARK_BLUE};
-  font-family: 'Roboto', var(--andover-font-sans);
+  font-family: "Roboto", var(--andover-font-sans);
 `;
 
 const StatLabel = styled.div`
@@ -200,7 +281,12 @@ const StatPieChartSVG = ({ percentage }) => {
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <svg width="100" height="100" viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)', marginBottom: '0.8rem' }}>
+    <svg
+      width="100"
+      height="100"
+      viewBox="0 0 100 100"
+      style={{ transform: "rotate(-90deg)", marginBottom: "0.8rem" }}
+    >
       {/* Background circle */}
       <circle
         cx="50"
@@ -222,7 +308,10 @@ const StatPieChartSVG = ({ percentage }) => {
         strokeDasharray={circumference}
         initial={{ strokeDashoffset: circumference }}
         animate={{ strokeDashoffset: strokeDashoffset }}
-        transition={{ duration: 0.5, ease: 'easeOut' }} /* Reduced duration for faster animation */
+        transition={{
+          duration: 0.5,
+          ease: "easeOut",
+        }} /* Reduced duration for faster animation */
       />
     </svg>
   );
@@ -230,7 +319,7 @@ const StatPieChartSVG = ({ percentage }) => {
 
 const StatPieChartLabel = styled.div`
   font-size: 1.3rem;
-  font-family: 'Roboto', var(--andover-font-sans);
+  font-family: "Roboto", var(--andover-font-sans);
   font-weight: 700;
   color: ${DARK_BLUE};
   margin-bottom: 0.4rem;
@@ -253,20 +342,89 @@ const BookIcon = () => <span>📖</span>;
 const HandsIcon = () => <span>✋</span>;
 const CityIcon = () => <span>🏙️</span>;
 const TownIcon = () => <span>🏘️</span>;
-const MoneyIcon = () => <span role="img" aria-label="money">💸</span>;
+const MoneyIcon = () => (
+  <span role="img" aria-label="money">
+    💸
+  </span>
+);
 
 // Array of stat data
 const statsData = [
   // First row
-  { id: 1, type: 'pie', percentage: 46, label: 'Members', number: '26,927', pieLabel: '49% Male, 48% Female, 3% Others', gridColumn: 'span 3', gridRow: '1' },
-  { id: 2, type: 'icon', icon: <GlobeIcon />, label: 'Countries', number: '161', gridColumn: 'span 3', gridRow: '1' },
-  { id: 3, type: 'icon', icon: <USAIcon />, label: 'Intergovermental Bodies Engaged', number: '37', gridColumn: 'span 3', gridRow: '1' },
-  { id: 4, type: 'icon', icon: <BuildingIcon />, label: 'Year of Founding', number: '2021', gridColumn: 'span 3', gridRow: '1' },
+  {
+    id: 1,
+    type: "pie",
+    percentage: 46,
+    label: "Members",
+    number: "26,927",
+    pieLabel: "49% Male, 48% Female, 3% Others",
+    gridColumn: "span 3",
+    gridRow: "1",
+  },
+  {
+    id: 2,
+    type: "icon",
+    icon: <GlobeIcon />,
+    label: "Countries",
+    number: "161",
+    gridColumn: "span 3",
+    gridRow: "1",
+  },
+  {
+    id: 3,
+    type: "icon",
+    icon: <USAIcon />,
+    label: "Intergovermental Bodies Engaged",
+    number: "37",
+    gridColumn: "span 3",
+    gridRow: "1",
+  },
+  {
+    id: 4,
+    type: "icon",
+    icon: <BuildingIcon />,
+    label: "Year of Founding",
+    number: "2021",
+    gridColumn: "span 3",
+    gridRow: "1",
+  },
   // Second row
-  { id: 6, type: 'icon', icon: <HandsIcon />, label: 'Inputs,Statements<br/>and Interventions Produced in 2024', number: '32', gridColumn: 'span 3', gridRow: '2' },
-  { id: 7, type: 'icon', icon: <BookIcon />, label: 'Programs', number: '12', gridColumn: 'span 3', gridRow: '2' },
-  { id: 8, type: 'icon', icon: <CityIcon />, label: 'Raised in 2024', number: '$24K', gridColumn: 'span 3', gridRow: '2' },
-  { id: 5, type: 'icon', icon: <MoneyIcon />, label: 'Membership Fee', number: '$0', gridColumn: 'span 3', gridRow: '2' },
+  {
+    id: 6,
+    type: "icon",
+    icon: <HandsIcon />,
+    label: "Inputs,Statements<br/>and Interventions Produced in 2024",
+    number: "32",
+    gridColumn: "span 3",
+    gridRow: "2",
+  },
+  {
+    id: 7,
+    type: "icon",
+    icon: <BookIcon />,
+    label: "Programs",
+    number: "12",
+    gridColumn: "span 3",
+    gridRow: "2",
+  },
+  {
+    id: 8,
+    type: "icon",
+    icon: <CityIcon />,
+    label: "Raised in 2024",
+    number: "$24K",
+    gridColumn: "span 3",
+    gridRow: "2",
+  },
+  {
+    id: 5,
+    type: "icon",
+    icon: <MoneyIcon />,
+    label: "Membership Fee",
+    number: "$0",
+    gridColumn: "span 3",
+    gridRow: "2",
+  },
 ];
 
 const DayLifeSection = styled(motion.section)`
@@ -277,7 +435,8 @@ const DayLifeSection = styled(motion.section)`
   gap: 2rem;
   background: white;
   border-radius: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   position: relative;
   overflow: hidden;
   @media (max-width: 768px) {
@@ -372,7 +531,8 @@ const GlanceSectionContainer = styled(motion.section)`
   margin: 4rem 0; /* Add margin to the section */
   background: white; /* Add white background */
   border-radius: 1rem; /* Add rounded corners */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Add shadow */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Add shadow */
   overflow: hidden;
 `;
 
@@ -426,7 +586,8 @@ const GlanceTextBlock = styled.div`
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
-  border-left: ${({ $isHovered }) => ($isHovered ? `4px solid ${ABBOT_BLUE}` : `1.5px solid #e0e0e0`)};
+  border-left: ${({ $isHovered }) =>
+    $isHovered ? `4px solid ${ABBOT_BLUE}` : `1.5px solid #e0e0e0`};
 
   h3 {
     font-size: 1.5rem;
@@ -436,7 +597,7 @@ const GlanceTextBlock = styled.div`
     margin-bottom: 0.75rem;
     transition: color 300ms ease-in-out;
   }
-/* This is the new part for the link */
+  /* This is the new part for the link */
   h3 a {
     color: inherit;
     text-decoration: none;
@@ -453,7 +614,7 @@ const GlanceTextBlock = styled.div`
     background-color: #f9f9f9;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    
+
     h3 {
       color: ${ABBOT_BLUE};
     }
@@ -468,7 +629,8 @@ const NewsSection = styled(motion.section)`
   gap: 2rem;
   background: white;
   border-radius: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   position: relative;
   overflow: hidden;
 
@@ -515,12 +677,14 @@ const NewsCard = styled.div`
 
   @media (max-width: 600px) {
     border-radius: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   }
 `;
 
 const NewsImg = styled.div`
-  background: url(${props => props.imageSrc || 'https://via.placeholder.com/260x140?text=News'}) center/cover no-repeat;
+  background: url(${(props) =>
+      props.imageSrc || "https://via.placeholder.com/260x140?text=News"})
+    center/cover no-repeat;
   height: 140px;
 
   @media (max-width: 600px) {
@@ -549,8 +713,12 @@ const NewsContent = styled.div`
 
   @media (max-width: 600px) {
     padding: 0.7rem 0.2rem;
-    h3 { font-size: 1rem; }
-    p { font-size: 0.95rem; }
+    h3 {
+      font-size: 1rem;
+    }
+    p {
+      font-size: 0.95rem;
+    }
   }
 `;
 
@@ -562,7 +730,8 @@ const EventsSection = styled(motion.section)`
   gap: 2rem;
   background: white;
   border-radius: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   position: relative;
   overflow: hidden;
 
@@ -648,8 +817,6 @@ const EventTitle = styled.h4`
   }
 `;
 
-
-
 const EventMeta = styled.div`
   display: flex;
   flex-direction: column;
@@ -659,7 +826,7 @@ const EventMeta = styled.div`
   font-size: 0.875rem;
   margin-bottom: 1rem;
   opacity: 0.9;
-  color:rgb(54, 59, 54);
+  color: rgb(54, 59, 54);
 
   @media (max-width: 600px) {
     font-size: 0.85rem;
@@ -693,40 +860,68 @@ const ApplyButton = styled.div`
 
 const eventsData = [
   {
-    title: 'DMUN Moot Court 2025',
-    date: 'Jun 28, 2025',
-    mode: 'Online',
-    imageUrl: '/moot-court.jpeg',
-    link: 'https://mymun.com/conferences/dmun-moot-court-2025'
+    title: "DMUN Moot Court 2025",
+    date: "Jun 28, 2025",
+    mode: "Online",
+    imageUrl: "/moot-court.jpeg",
+    link: "https://mymun.com/conferences/dmun-moot-court-2025",
   },
   {
-    title: 'The DMUN Foundation Sustainability Forum',
-    date: 'Jul 12, 2025',
-    mode: 'Online',
-    imageUrl: '/sustainability-forum.jpeg',
-    link: 'https://mymun.com/conferences/dmunsf-2025'
+    title: "The DMUN Foundation Sustainability Forum",
+    date: "Jul 12, 2025",
+    mode: "Online",
+    imageUrl: "/sustainability-forum.jpeg",
+    link: "https://mymun.com/conferences/dmunsf-2025",
   },
   {
-    title: 'DMUN ANNUAL MEETINGS 2025',
-    date: 'Jul 19, 2025',
-    mode: 'Online',
-    imageUrl: '/annual-meetings.jpeg',
-    link: 'https://mymun.com/conferences/dmun-debate-2025'
+    title: "DMUN ANNUAL MEETINGS 2025",
+    date: "Jul 19, 2025",
+    mode: "Online",
+    imageUrl: "/annual-meetings.jpeg",
+    link: "https://mymun.com/conferences/dmun-debate-2025",
   },
   {
-    title: 'DMUN Debate 2025',
-    date: 'Jul 15, 2025',
-    mode: 'Online',
-    imageUrl: '/debate.jpeg',
-    link: 'https://mymun.com/conferences/dmun-debate-2025'
-  }
+    title: "DMUN Debate 2025",
+    date: "Jul 15, 2025",
+    mode: "Online",
+    imageUrl: "/debate.jpeg",
+    link: "https://mymun.com/conferences/dmun-debate-2025",
+  },
 ];
 // Data for the interactive section (Placeholder)
 const glanceData = [
-  { id: 1, title: 'Programs', path: '/programs', subtext: 'Our immersive initiatives empower students to engage with diplomacy, leadership, and public speaking — preparing them for impact far beyond the classroom.', imageUrl: '/programshome.jpeg' },
-  { id: 2, title: 'Advocacy', path: '/advocacy', subtext: 'We champion youth voices by equipping students with the tools to articulate ideas, challenge norms, and represent communities with confidence and clarity.', imageUrl: 'advocacy.jpeg' },
-  { id: 3, title: 'Research', path: '/research', subtext: 'From policy papers to global simulations, students explore complex issues through inquiry, collaboration, and innovation — fostering real-world readiness.', imageUrl: '/researchhome.jpeg' },
-  { id: 4, title: 'Integrity', path: '/integrity', subtext: 'Grounded in ethics and empathy, our mission is to cultivate principled leaders who lead with purpose and act with responsibility in every forum they enter.', imageUrl: '/integrityhome.jpeg' },
+  {
+    id: 1,
+    title: "Programs",
+    path: "/programs",
+    subtext:
+      "Our immersive initiatives empower students to engage with diplomacy, leadership, and public speaking — preparing them for impact far beyond the classroom.",
+    imageUrl: "/programshome.jpeg",
+  },
+  {
+    id: 2,
+    title: "Advocacy",
+    path: "/advocacy",
+    subtext:
+      "We champion youth voices by equipping students with the tools to articulate ideas, challenge norms, and represent communities with confidence and clarity.",
+    imageUrl: "advocacy.jpeg",
+  },
+  {
+    id: 3,
+    title: "Research",
+    path: "/research",
+    subtext:
+      "From policy papers to global simulations, students explore complex issues through inquiry, collaboration, and innovation — fostering real-world readiness.",
+    imageUrl: "/researchhome.jpeg",
+  },
+  {
+    id: 4,
+    title: "Integrity",
+    path: "/integrity",
+    subtext:
+      "Grounded in ethics and empathy, our mission is to cultivate principled leaders who lead with purpose and act with responsibility in every forum they enter.",
+    imageUrl: "/integrityhome.jpeg",
+  },
 ];
 
 // Data for the interactive section (Placeholder)
@@ -734,84 +929,145 @@ const glanceData = [
 const newsData = [
   {
     id: 1,
-    title: 'YouthCubed Nominates 2 Global Youth Representatives for the Summit of the Future',
-    summary: 'View photos, videos and a recap of the Summit of the Future.',
-    imageUrl: '/Article-1.jpeg',
-    path: '/newsroom/1'
+    title:
+      "YouthCubed Nominates 2 Global Youth Representatives for the Summit of the Future",
+    summary: "View photos, videos and a recap of the Summit of the Future.",
+    imageUrl: "/Article-1.jpeg",
+    path: "/newsroom/1",
   },
   {
     id: 2,
-    title: 'DMUN Foundation @ FfD4',
-    summary: 'Learn more about our invitation by the UNGA President to participate in the Fourth International Conference on Financing for Development.',
-    imageUrl: '/Article-2.jpeg',
-    path: '/newsroom/2'
+    title: "DMUN Foundation @ FfD4",
+    summary:
+      "Learn more about our invitation by the UNGA President to participate in the Fourth International Conference on Financing for Development.",
+    imageUrl: "/Article-2.jpeg",
+    path: "/newsroom/2",
   },
   {
     id: 3,
-    title: 'COP28 UAE',
-    summary: 'Learn more about our engagement at COP28 UAE as a youth-led civil society stakeholder.',
-    imageUrl: '/Article-3.jpeg',
-    path: '/newsroom/3'
-  }
+    title: "COP28 UAE",
+    summary:
+      "Learn more about our engagement at COP28 UAE as a youth-led civil society stakeholder.",
+    imageUrl: "/Article-3.jpeg",
+    path: "/newsroom/3",
+  },
 ];
+
+const HOME_DEFAULT_CONTENT = {
+  hero: {
+    lines: ["Representing Youth,", "Building Leaders."],
+    subtitle:
+      "DMUN Foundation empowers young diplomats through free, world-class programming and global opportunities.",
+    primaryCta: { text: "Explore Programs", link: "/programs" },
+    secondaryCta: { text: "Volunteer", link: "/volunteer" },
+    banner: { enabled: false, text: "", link: "" },
+  },
+};
 
 const Home = () => {
   const [activeImage, setActiveImage] = useState(glanceData[0].imageUrl);
   const [hoveredItemId, setHoveredItemId] = useState(null);
+  const defaultContent = useMemo(() => HOME_DEFAULT_CONTENT, []);
+  const homeContent = usePersonalizedContent("home", defaultContent);
+  const hero = homeContent.hero || HOME_DEFAULT_CONTENT.hero;
+  const heroLines =
+    hero.lines && hero.lines.length
+      ? hero.lines
+      : HOME_DEFAULT_CONTENT.hero.lines;
 
   return (
     <MainContentFrame>
       <HeroWrapper className="dmun-hero-section">
-      <div className="dmun-hero-text" style={{ textAlign: 'center' }}>
-  <SplitText
-    text="Representing Youth,"
-    delay={100}
-    duration={0.6}
-    ease="power3.out"
-    splitType="words, chars"
-    from={{ opacity: 0, y: 40 }}
-    to={{ opacity: 1, y: 0 }}
-    threshold={0.1}
-    rootMargin="-100px"
-    style={{
-      position: 'relative',
-      zIndex: 3,
-      color: '#FFFFFF',
-      fontSize: '6vw',
-      fontFamily: 'Benton Sans Bold, var(--andover-font-sans)',
-      fontWeight: 700,
-      letterSpacing: '3px',
-      textShadow: 'none',
-      textTransform: 'uppercase',
-      lineHeight: 1.2,
-    }}
-  />
-  <br />
-  <SplitText
-    text="Building Leaders."
-    delay={100}
-    duration={0.6}
-    ease="power3.out"
-    splitType="words, chars"
-    from={{ opacity: 0, y: 40 }}
-    to={{ opacity: 1, y: 0 }}
-    threshold={0.1}
-    rootMargin="-100px"
-    style={{
-      position: 'relative',
-      zIndex: 3,
-      color: '#FFFFFF',
-      fontSize: '6vw',
-      fontFamily: 'Benton Sans Bold, var(--andover-font-sans)',
-      fontWeight: 700,
-      letterSpacing: '3px',
-      textShadow: 'none',
-      textTransform: 'uppercase',
-      lineHeight: 1.2,
-      marginTop: '-5vw',
-    }}
-  />
-</div>
+        <HeroContent className="dmun-hero-text">
+          {heroLines.map((line, index) => (
+            <SplitText
+              key={`${line}-${index}`}
+              text={line}
+              delay={100}
+              duration={0.6}
+              ease="power3.out"
+              splitType="words, chars"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              style={{
+                position: "relative",
+                zIndex: 3,
+                color: "#FFFFFF",
+                fontSize: "clamp(2.6rem, 6vw, 4.6rem)",
+                fontFamily: "Benton Sans Bold, var(--andover-font-sans)",
+                fontWeight: 700,
+                letterSpacing: "0.3rem",
+                textShadow: "none",
+                textTransform: "uppercase",
+                lineHeight: 1.08,
+                marginTop: index === 0 ? 0 : "0.6rem",
+                textAlign: "center",
+              }}
+            />
+          ))}
+
+          {hero.subtitle && <HeroSubtitle>{hero.subtitle}</HeroSubtitle>}
+
+          {(hero.primaryCta?.text || hero.secondaryCta?.text) && (
+            <HeroButtons>
+              {hero.primaryCta?.text && (
+                <HeroButton
+                  as={hero.primaryCta.link?.startsWith("http") ? "a" : Link}
+                  to={
+                    hero.primaryCta.link?.startsWith("http")
+                      ? undefined
+                      : hero.primaryCta.link || "/programs"
+                  }
+                  href={
+                    hero.primaryCta.link?.startsWith("http")
+                      ? hero.primaryCta.link
+                      : undefined
+                  }
+                >
+                  {hero.primaryCta.text}
+                </HeroButton>
+              )}
+              {hero.secondaryCta?.text && (
+                <HeroButton
+                  $secondary
+                  as={hero.secondaryCta.link?.startsWith("http") ? "a" : Link}
+                  to={
+                    hero.secondaryCta.link?.startsWith("http")
+                      ? undefined
+                      : hero.secondaryCta.link || "/volunteer"
+                  }
+                  href={
+                    hero.secondaryCta.link?.startsWith("http")
+                      ? hero.secondaryCta.link
+                      : undefined
+                  }
+                >
+                  {hero.secondaryCta.text}
+                </HeroButton>
+              )}
+            </HeroButtons>
+          )}
+
+          {hero.banner?.enabled && hero.banner.text && (
+            <HeroPromo
+              as={hero.banner.link?.startsWith("http") ? "a" : Link}
+              to={
+                hero.banner.link?.startsWith("http")
+                  ? undefined
+                  : hero.banner.link || "/newsroom"
+              }
+              href={
+                hero.banner.link?.startsWith("http")
+                  ? hero.banner.link
+                  : undefined
+              }
+            >
+              {hero.banner.text}
+            </HeroPromo>
+          )}
+        </HeroContent>
       </HeroWrapper>
 
       <ContentWrapper>
@@ -821,27 +1077,39 @@ const Home = () => {
               key={stat.id}
               style={{ gridColumn: stat.gridColumn, gridRow: stat.gridRow }}
             >
-              {stat.type === 'pie' && (
+              {stat.type === "pie" && (
                 <>
                   <StatPieChartSVG percentage={stat.percentage} />
                   <StatPieChartLabel>{stat.pieLabel}</StatPieChartLabel>
-                  {stat.subLabel && <StatPieChartSubLabel>{stat.subLabel}</StatPieChartSubLabel>}
+                  {stat.subLabel && (
+                    <StatPieChartSubLabel>{stat.subLabel}</StatPieChartSubLabel>
+                  )}
                 </>
               )}
-              {stat.type === 'icon' && <StatIcon>{stat.icon}</StatIcon>}
-              {(stat.type === 'icon' || stat.type === 'text' || stat.type === 'pie') && (
+              {stat.type === "icon" && <StatIcon>{stat.icon}</StatIcon>}
+              {(stat.type === "icon" ||
+                stat.type === "text" ||
+                stat.type === "pie") && (
                 <>
-                  {(stat.type === 'icon' || stat.type === 'text') && (
-                    <StatNumber dangerouslySetInnerHTML={{ __html: stat.number }} />
+                  {(stat.type === "icon" || stat.type === "text") && (
+                    <StatNumber
+                      dangerouslySetInnerHTML={{ __html: stat.number }}
+                    />
                   )}
-                  {(stat.type === 'icon' || stat.type === 'text') && (
-                    <StatLabel dangerouslySetInnerHTML={{ __html: stat.label }} />
+                  {(stat.type === "icon" || stat.type === "text") && (
+                    <StatLabel
+                      dangerouslySetInnerHTML={{ __html: stat.label }}
+                    />
                   )}
                   {/* Handle the specific case for the first pie chart that also has a main number and label */}
                   {stat.id === 1 && (
                     <>
-                      <StatNumber dangerouslySetInnerHTML={{ __html: stat.number }} />
-                      <StatLabel dangerouslySetInnerHTML={{ __html: stat.label }} />
+                      <StatNumber
+                        dangerouslySetInnerHTML={{ __html: stat.number }}
+                      />
+                      <StatLabel
+                        dangerouslySetInnerHTML={{ __html: stat.label }}
+                      />
                     </>
                   )}
                 </>
@@ -893,15 +1161,17 @@ const Home = () => {
         >
           <DayLifeTitle>The DMUN Difference</DayLifeTitle>
           <Circles>
-            <motion.div variants={itemVariants}> {/* Apply itemVariants to TiltedCard wrapper */}
-              <TiltedCard 
+            <motion.div variants={itemVariants}>
+              {" "}
+              {/* Apply itemVariants to TiltedCard wrapper */}
+              <TiltedCard
                 imageSrc="/dmundifference.jpeg"
                 imageAlt="Student 1"
-                title="Free" 
+                title="Free"
                 text="The day begins bright and early with morning classes and engaging discussions."
-                containerHeight="300px" 
-                containerWidth="300px" 
-                imageHeight="300px" 
+                containerHeight="300px"
+                containerWidth="300px"
+                imageHeight="300px"
                 imageWidth="300px"
                 rotateAmplitude={5} /* Reduced rotation */
                 scaleOnHover={1.05} /* Subtle scale on hover */
@@ -909,15 +1179,17 @@ const Home = () => {
                 borderRadius="10px" /* Sharper corners */
               />
             </motion.div>
-            <motion.div variants={itemVariants}> {/* Apply itemVariants to TiltedCard wrapper */}
-              <TiltedCard 
+            <motion.div variants={itemVariants}>
+              {" "}
+              {/* Apply itemVariants to TiltedCard wrapper */}
+              <TiltedCard
                 imageSrc="/online.jpeg"
                 imageAlt="Student 2"
-                title="Free" 
+                title="Free"
                 text="After classes, students participate in a wide range of extracurricular activities."
-                containerHeight="300px" 
-                containerWidth="300px" 
-                imageHeight="300px" 
+                containerHeight="300px"
+                containerWidth="300px"
+                imageHeight="300px"
                 imageWidth="300px"
                 rotateAmplitude={5}
                 scaleOnHover={1.05}
@@ -925,15 +1197,17 @@ const Home = () => {
                 borderRadius="10px"
               />
             </motion.div>
-            <motion.div variants={itemVariants}> {/* Apply itemVariants to TiltedCard wrapper */}
-              <TiltedCard 
+            <motion.div variants={itemVariants}>
+              {" "}
+              {/* Apply itemVariants to TiltedCard wrapper */}
+              <TiltedCard
                 imageSrc="/youth-led.jpeg"
                 imageAlt="Student 3"
-                title="Evening Programs" 
+                title="Evening Programs"
                 text="Evenings are filled with study groups, club meetings, and social events."
-                containerHeight="300px" 
-                containerWidth="300px" 
-                imageHeight="300px" 
+                containerHeight="300px"
+                containerWidth="300px"
+                imageHeight="300px"
                 imageWidth="300px"
                 rotateAmplitude={5}
                 scaleOnHover={1.05}
@@ -942,18 +1216,30 @@ const Home = () => {
               />
             </motion.div>
           </Circles>
-           {/* Adding placeholder text elements for the Day in the Life section */}
+          {/* Adding placeholder text elements for the Day in the Life section */}
           <DayInLifeText>
             <h3>Free</h3>
-            <p>Access to DMUN is completely free — because opportunity should never come with a price tag. We believe every student deserves a seat at the table, regardless of background.</p>
+            <p>
+              Access to DMUN is completely free — because opportunity should
+              never come with a price tag. We believe every student deserves a
+              seat at the table, regardless of background.
+            </p>
           </DayInLifeText>
           <DayInLifeText>
             <h3>Youth Led</h3>
-            <p>DMUN is built by students, for students. From designing agendas to leading sessions, young voices shape every step — making leadership real, not rehearsed.</p>
+            <p>
+              DMUN is built by students, for students. From designing agendas to
+              leading sessions, young voices shape every step — making
+              leadership real, not rehearsed.
+            </p>
           </DayInLifeText>
-           <DayInLifeText>
+          <DayInLifeText>
             <h3>Online</h3>
-            <p>Our online platform connects students across the globe in real time. With accessibility at its core, DMUN removes barriers and brings diplomacy to your screen.</p>
+            <p>
+              Our online platform connects students across the globe in real
+              time. With accessibility at its core, DMUN removes barriers and
+              brings diplomacy to your screen.
+            </p>
           </DayInLifeText>
         </DayLifeSection>
         <NewsSection
@@ -962,14 +1248,26 @@ const Home = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={sectionVariants}
         >
-          <NewsTitle><Link to="/newsroom" style={{color: 'black', textDecoration: 'none'}}>DMUN NEWS</Link></NewsTitle>
+          <NewsTitle>
+            <Link
+              to="/newsroom"
+              style={{ color: "black", textDecoration: "none" }}
+            >
+              DMUN NEWS
+            </Link>
+          </NewsTitle>
           <NewsGrid>
-            {newsData.map(article => (
+            {newsData.map((article) => (
               <NewsCard key={article.id}>
                 <NewsImg imageSrc={article.imageUrl} />
                 <NewsContent>
                   <h3>
-                    <Link to={article.path} style={{color: 'inherit', textDecoration: 'none'}}>{article.title}</Link>
+                    <Link
+                      to={article.path}
+                      style={{ color: "inherit", textDecoration: "none" }}
+                    >
+                      {article.title}
+                    </Link>
                   </h3>
                   <p>{article.summary}</p>
                 </NewsContent>
@@ -986,12 +1284,13 @@ const Home = () => {
           <EventsTitle>Upcoming Events</EventsTitle>
           <EventsGrid>
             {eventsData.map((event, index) => (
-              <EventCard key={index} href={event.link} imageSrc={event.imageUrl}>
+              <EventCard
+                key={index}
+                href={event.link}
+                imageSrc={event.imageUrl}
+              >
                 <EventCardContent>
-                  <EventTitle>
-                    {event.title}
-                  
-                  </EventTitle>
+                  <EventTitle>{event.title}</EventTitle>
                   <EventMeta>
                     <span>{event.mode}</span>
                     <span>{event.date}</span>
@@ -1007,7 +1306,7 @@ const Home = () => {
   );
 };
 
-export default Home; 
+export default Home;
 
 // --- MOBILE-ONLY LAYOUT FIXES ---
 const mobileGlobal = `
@@ -1037,4 +1336,4 @@ const mobileGlobal = `
     }
   }
 `;
-// Add mobileGlobal to the end of every styled-component definition in this file. 
+// Add mobileGlobal to the end of every styled-component definition in this file.

@@ -1,16 +1,18 @@
-import styled, { keyframes } from 'styled-components';
-import { Link } from 'react-router-dom';
+import styled, { keyframes } from "styled-components";
+import { Link } from "react-router-dom";
+import { useMemo } from "react";
+import { usePersonalizedContent } from "../context/RuleContext";
 
-const ABBOT_BLUE = '#44b8f3';
-const DARK_BLUE = '#002147';
-const LIGHT_BLUE = '#97e1e6';
+const ABBOT_BLUE = "#44b8f3";
+const DARK_BLUE = "#002147";
+const LIGHT_BLUE = "#97e1e6";
 
 // New color for the main page background
-const PAGE_BACKGROUND_COLOR = '#E7F1FA';
+const PAGE_BACKGROUND_COLOR = "#E7F1FA";
 
 // New colors for subnavigation section
-const SUBNAV_GRAY_TEXT = '#555'; // Slightly darker gray for text
-const SUBNAV_YELLOW_ICON = '#FFD700'; // A golden yellow for the icon
+const SUBNAV_GRAY_TEXT = "#555"; // Slightly darker gray for text
+const SUBNAV_YELLOW_ICON = "#FFD700"; // A golden yellow for the icon
 
 const AboutHeroWrapper = styled.section`
   position: relative;
@@ -20,7 +22,7 @@ const AboutHeroWrapper = styled.section`
   margin-left: -50vw;
   margin-right: -50vw;
   height: 350px;
-  background: url('/Youth-Advocacy.png') center/cover no-repeat;
+  background: url("/Youth-Advocacy.png") center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,8 +31,11 @@ const AboutHeroWrapper = styled.section`
   &::before {
     content: " ";
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(0,0,0,0.4);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
     z-index: 2;
   }
   @media (max-width: 768px) {
@@ -46,7 +51,7 @@ const AboutHeroText = styled.h1`
   position: relative;
   z-index: 3;
   color: #fff !important;
-  font-size: 4vw;
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
   font-family: var(--andover-font-serif);
   font-weight: 400;
   letter-spacing: 0.01em;
@@ -61,6 +66,25 @@ const AboutHeroText = styled.h1`
     text-align: center;
     word-break: break-word;
   }
+`;
+
+const HeroContent = styled.div`
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.8rem, 2vw, 1.5rem);
+  text-align: center;
+  padding: 0 3vw;
+`;
+
+const HeroSubtitle = styled.p`
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  line-height: 1.6;
+  max-width: 720px;
 `;
 
 // Styled component for the bordered content wrapper
@@ -163,7 +187,7 @@ const LeadershipSection = styled.section`
   background: ${DARK_BLUE};
   color: ${LIGHT_BLUE} !important;
   padding: 4rem 0 2.5rem 0;
-  animation: ${fadeIn} 0.8s cubic-bezier(0.4,0,0.2,1);
+  animation: ${fadeIn} 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
   padding-left: 0;
   padding-right: 0;
@@ -253,7 +277,7 @@ const LeadershipCardsRow = styled.div`
   align-items: flex-start;
   gap: 3.5rem;
   margin-bottom: 2.5rem;
-  animation: ${fadeIn} 1.2s cubic-bezier(0.4,0,0.2,1);
+  animation: ${fadeIn} 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   max-width: 1100px;
   margin-left: auto;
   margin-right: auto;
@@ -285,9 +309,11 @@ const LeaderImg = styled.div`
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: #6c7a89 url('https://via.placeholder.com/120x120?text=Photo') center/cover no-repeat;
+  background: #6c7a89 url("https://via.placeholder.com/120x120?text=Photo")
+    center/cover no-repeat;
   margin-bottom: 1.2rem;
-  filter: ${({ $isColor }) => ($isColor ? 'none' : 'grayscale(1) contrast(1.1)')};
+  filter: ${({ $isColor }) =>
+    $isColor ? "none" : "grayscale(1) contrast(1.1)"};
   border: none; /* Ensure no border on LeaderImg */
   @media (max-width: 768px) {
     width: 100px;
@@ -359,8 +385,8 @@ const NavArrow = styled.span`
   font-size: 2rem;
   position: absolute;
   bottom: 2.5rem;
-  left: ${({ right }) => (right ? 'unset' : '2.5rem')};
-  right: ${({ right }) => (right ? '2.5rem' : 'unset')};
+  left: ${({ right }) => (right ? "unset" : "2.5rem")};
+  right: ${({ right }) => (right ? "2.5rem" : "unset")};
   cursor: pointer;
   user-select: none;
   border: none; /* Ensure no border on NavArrow */
@@ -475,7 +501,15 @@ const YellowIconGraphic = styled.div`
 
 // Replicating ArrowIcon from Header.jsx for consistent styling
 const ArrowIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 14" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="butt" strokeLinejoin="miter">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 14"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="4"
+    strokeLinecap="butt"
+    strokeLinejoin="miter"
+  >
     <polyline points="2 2 12 12 22 2"></polyline>
   </svg>
 );
@@ -498,7 +532,7 @@ const CaretIcon = styled.span`
 
 const BuildingIconSVG = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-    <path d="M12 2L3 7v14h18V7L12 2zm0 2.236l7 3.889V9H5V6.125l7-3.889zM5 11h14v8H5v-8zm2 2h2v4H7v-4zm4 0h2v4h-2v-4zm4 0h2v4h-2v-4z"/>
+    <path d="M12 2L3 7v14h18V7L12 2zm0 2.236l7 3.889V9H5V6.125l7-3.889zM5 11h14v8H5v-8zm2 2h2v4H7v-4zm4 0h2v4h-2v-4zm4 0h2v4h-2v-4z" />
   </svg>
 );
 
@@ -552,139 +586,345 @@ const StyledExternalButton = styled.a`
   }
 `;
 
-const About = () => (
-  <>
-    <AboutHeroWrapper>
-      <AboutHeroText>About Us</AboutHeroText>
-    </AboutHeroWrapper>
-    <SubnavSection>
-      <SubnavContentWrapper>
-        <YellowIconGraphic>
-          <BuildingIconSVG />
-        </YellowIconGraphic>
-        <SubnavHeading>ABOUT</SubnavHeading>
-        <SubnavLinksContainer>
-          <SubnavLink href="#what-we-do">What We Do <CaretIcon><ArrowIcon /></CaretIcon></SubnavLink>
-          <SubnavLink href="#our-history">Our History <CaretIcon><ArrowIcon /></CaretIcon></SubnavLink>
-          <SubnavLink href="#our-philosophy">Our Philosophy <CaretIcon><ArrowIcon /></CaretIcon></SubnavLink>
-          <SubnavLink href="#annual-reports">Annual Reports <CaretIcon><ArrowIcon /></CaretIcon></SubnavLink>
-          <SubnavLink href="#our-impact">Impact <CaretIcon><ArrowIcon /></CaretIcon></SubnavLink>
-        </SubnavLinksContainer>
-      </SubnavContentWrapper>
-    </SubnavSection>
-    <BorderedContentWrapper>
-      <Main>
-        <Left>
-          <SectionTitle id="what-we-do">WHAT WE DO</SectionTitle>
-          <p>The DMUN Foundation is a youth-led, non-profit, non-governmental organisation.</p>
-          <p>We empower youths to be active and valid stakeholders.</p>
-          <p>We provide opportunities for youths to learn about international relations, diplomacy, legislative bodies, social entrepreneurship, sustainability, and greater youth participation in the intergovernmental system.</p>
+const MissionTagline = styled.div`
+  background: rgba(68, 184, 243, 0.12);
+  border: 1px solid rgba(68, 184, 243, 0.35);
+  border-radius: 16px;
+  padding: 1rem 1.4rem;
+  margin: 1.5rem 0;
+  font-family: var(--andover-font-serif);
+  font-size: 1.05rem;
+  color: ${DARK_BLUE};
+  line-height: 1.6;
+`;
 
-          {/* New Vision and Mission Sections */}
-          <SectionTitle>Our Vision</SectionTitle>
-          <p>Our vision is to enable youths to become active global citizens and future leaders through our programs and opportunities, receiving necessary skills and resources for them contribute effectively and meaningfully to the objectives of sustainable development, peace, multilateralism, and the overall betterment of the world.</p>
+const ABOUT_DEFAULT_CONTENT = {
+  heroTitle: "About Us",
+  heroSubtitle:
+    "We are a youth-led foundation expanding access to diplomacy, governance, and civic leadership education worldwide.",
+  missionIntro: [
+    "The DMUN Foundation is a youth-led, non-profit organisation committed to democratizing diplomacy education.",
+    "We empower young people to become active stakeholders in the conversations that shape our world.",
+    "Through accessible programs, we build pathways into international relations, public policy, and civic leadership.",
+  ],
+  impactTagline:
+    "Together we advance youth leadership, multilingual communication, and inclusive diplomacy.",
+};
 
-          <SectionTitle>Our Mission</SectionTitle>
-          <ul style={{ marginBottom: '2rem', marginTop: '0.5rem' }}>
-            <li>Equip young people with opportunities to be informed of global events, helping young people express their perspectives on said issues.</li>
-            <li>Provide support to ensure that young people are given effective representation in multilateral and intergovernmental engagements, with particular concentration towards youths of underrepresented backgrounds.</li>
-            <li>Demonstrate that youth-led organizations are well-capable of fulfilling any and all obligations expected of civil society stakeholders expected by society.</li>
-          </ul>
+const About = () => {
+  const defaultContent = useMemo(() => ABOUT_DEFAULT_CONTENT, []);
+  const aboutContent = usePersonalizedContent("about", defaultContent);
+  const missionIntro =
+    aboutContent.missionIntro && aboutContent.missionIntro.length
+      ? aboutContent.missionIntro
+      : defaultContent.missionIntro;
 
-          <SectionTitle id="our-history">Our History and Origins</SectionTitle>
-          <p>Our journey began with a middle school student's ​vision to democratize education and make ​programs like Model United Nations (MUN) ​accessible to all. Inspired by the exclusivity and ​high costs of such programs, this young visionary ​embarked on creating a platform that would break ​down financial barriers and provide equal learning ​opportunities in politics, governance, and ​international relations.
+  return (
+    <>
+      <AboutHeroWrapper>
+        <HeroContent>
+          <AboutHeroText>
+            {aboutContent.heroTitle || defaultContent.heroTitle}
+          </AboutHeroText>
+          {aboutContent.heroSubtitle && (
+            <HeroSubtitle>{aboutContent.heroSubtitle}</HeroSubtitle>
+          )}
+        </HeroContent>
+      </AboutHeroWrapper>
+      <SubnavSection>
+        <SubnavContentWrapper>
+          <YellowIconGraphic>
+            <BuildingIconSVG />
+          </YellowIconGraphic>
+          <SubnavHeading>ABOUT</SubnavHeading>
+          <SubnavLinksContainer>
+            <SubnavLink href="#what-we-do">
+              What We Do{" "}
+              <CaretIcon>
+                <ArrowIcon />
+              </CaretIcon>
+            </SubnavLink>
+            <SubnavLink href="#our-history">
+              Our History{" "}
+              <CaretIcon>
+                <ArrowIcon />
+              </CaretIcon>
+            </SubnavLink>
+            <SubnavLink href="#our-philosophy">
+              Our Philosophy{" "}
+              <CaretIcon>
+                <ArrowIcon />
+              </CaretIcon>
+            </SubnavLink>
+            <SubnavLink href="#annual-reports">
+              Annual Reports{" "}
+              <CaretIcon>
+                <ArrowIcon />
+              </CaretIcon>
+            </SubnavLink>
+            <SubnavLink href="#our-impact">
+              Impact{" "}
+              <CaretIcon>
+                <ArrowIcon />
+              </CaretIcon>
+            </SubnavLink>
+          </SubnavLinksContainer>
+        </SubnavContentWrapper>
+      </SubnavSection>
+      <BorderedContentWrapper>
+        <Main>
+          <Left>
+            <SectionTitle id="what-we-do">WHAT WE DO</SectionTitle>
+            {missionIntro.map((paragraph, index) => (
+              <p key={`mission-${index}`}>{paragraph}</p>
+            ))}
 
-Through dedication and a commitment to ​inclusivity, our organization quickly grew, ​connecting students worldwide. Today, we stand ​as a testament to the power of youth-driven ​initiatives and the belief that education should ​know no bounds.</p>
+            {aboutContent.impactTagline && (
+              <MissionTagline>{aboutContent.impactTagline}</MissionTagline>
+            )}
 
-         
+            {/* New Vision and Mission Sections */}
+            <SectionTitle>Our Vision</SectionTitle>
+            <p>
+              Our vision is to enable youths to become active global citizens
+              and future leaders through our programs and opportunities,
+              receiving necessary skills and resources for them contribute
+              effectively and meaningfully to the objectives of sustainable
+              development, peace, multilateralism, and the overall betterment of
+              the world.
+            </p>
 
-          <SectionTitle id="our-philosophy">OUR PHILOSOPHY OF CHANGE</SectionTitle>
-          <p>We create a linear platform to identify, nurture, and support young leaders.</p>
-          <p>All of our programs and initiatives support each other in coherence. We believe that through our philosophy of change, our youth education programs, policy research, and policy advocacy form a trifecta of youth-led leadership and change.</p>
-          <p>
-  •   If youth receive the opportunities to learn about global issues,<br/>
-  •   Then, they will want to create action to address these issues.<br/>
-  •   If we provide platforms of advocacy for youths willing to take action,<br/>
-  •   Then, they are able to create meaningful progress.<br/>
-  •   If this cycle of change continues,<br/>
-  •   Then, more youths will be involved in creating positive contributions,<br/>
-  •   As a combined result, the world becomes a better place.
-</p>
-          
-          <SectionTitle id="annual-reports">Our Annual Reports</SectionTitle>
-          <p>View Our Annual Reports</p>
-          <StyledExternalButton href="https://drive.google.com/drive/folders/1Xe3NVwjf3lCdN7QVOaR2WDlJW-Hxrzfi?usp=share_link" target="_blank" rel="noopener noreferrer">Annual Reports</StyledExternalButton>
-          
+            <SectionTitle>Our Mission</SectionTitle>
+            <ul style={{ marginBottom: "2rem", marginTop: "0.5rem" }}>
+              <li>
+                Equip young people with opportunities to be informed of global
+                events, helping young people express their perspectives on said
+                issues.
+              </li>
+              <li>
+                Provide support to ensure that young people are given effective
+                representation in multilateral and intergovernmental
+                engagements, with particular concentration towards youths of
+                underrepresented backgrounds.
+              </li>
+              <li>
+                Demonstrate that youth-led organizations are well-capable of
+                fulfilling any and all obligations expected of civil society
+                stakeholders expected by society.
+              </li>
+            </ul>
 
-          <SectionTitle>Our Milestones</SectionTitle>
-          {/* Placeholder for images as indicated by the user's text */}
-          <p>Our milestones speak louder than words.</p>
-          <p>Throughout our journey, we've proudly set new records and marked historic firsts that reflect our commitment to youth empowerment and innovation. These accomplishments are proof of what's possible when young people lead with purpose.</p>
-          <ul>
-            <li>We operate the world's largest virtual Model UN conference.</li>
-            <li>We are the first organization to nominate people under the age of 18 to participate in 6 UN conferences.</li>
-            <li>Our advocacy eliminated the minimum age requirement in the United Nations Financing for Development Conferences.</li>
-            <li>We are the first youth-led organization to participate as Observer in 3 Intergovernmental Bodies and Organizations. (AHC Tax, OPCW, IPBES)</li>
-            <li>We are the first NGO dedicated in intergovernmental advocacy to have a leadership body comprised of majority people under the age of 18.</li>
-            <br></br><br></br>
-          </ul>
-        </Left>
-        <Right>
-          <SectionTitle id="our-impact">OUR IMPACT IN NUMBERS</SectionTitle>
-        
-          <Fact><strong>26k</strong><br/>Total participants in our program.</Fact>
-          <Fact><strong>24k</strong><br/>Raised for the Foundation in FY 2024 (in USD)</Fact>
-          <Fact><strong>161</strong><br/>Countries represented</Fact>
-          <Fact><strong>37</strong><br/>Intergovernmental bodies and conferences engaged</Fact>
-          <Fact><strong>32</strong><br/>Inputs, statement, and interventions produced in 2024</Fact>
-          <Fact><strong>12</strong><br/>Programs operated in 2025</Fact>
+            <SectionTitle id="our-history">
+              Our History and Origins
+            </SectionTitle>
+            <p>
+              Our journey began with a middle school student's vision to
+              democratize education and make programs like Model United Nations
+              (MUN) accessible to all. Inspired by the exclusivity and high
+              costs of such programs, this young visionary embarked on creating
+              a platform that would break down financial barriers and provide
+              equal learning opportunities in politics, governance, and
+              international relations.
+              <br />
+              <br />
+              Through dedication and a commitment to inclusivity, our
+              organization quickly grew, connecting students worldwide. Today,
+              we stand as a testament to the power of youth-driven initiatives
+              and the belief that education should know no bounds.
+            </p>
 
-         <StyledButton to="/take-action">Take Action</StyledButton>
-        </Right>
-      </Main>
-      <LeadershipSection>
-        <LeadershipContainer>
-          <LeadershipTitleRow>
-            <LeadershipTitle>Leadership</LeadershipTitle>
-            <LeadershipSubtitle>
-              Meet the dedicated individuals who guide our mission and inspire our community.
-            </LeadershipSubtitle>
-            
-          </LeadershipTitleRow>
-          <LeadershipCardsRow>
-            <LeadershipCard>
-              <LeaderImg style={{ backgroundImage: 'url("/jaewon-picture.jpg")' }} $isColor={true}/>
-              <LeaderName>Jaewon Choi</LeaderName>
-              <LeaderRole>Executive Director</LeaderRole>
-              <LeaderDesc>
-              Jaewon leads the organization with strategic vision, guiding its mission and overseeing all key initiatives.
-              </LeaderDesc>
-              <LeaderLink href="https://www.linkedin.com/in/jaewonchoidmun/">Learn More</LeaderLink>
-            </LeadershipCard>
-            <LeadershipCard>
-              <LeaderImg style={{ backgroundImage: 'url("/atharv-singh-professional.jpeg")' }} $isColor={true}/>
-              <LeaderName>Atharv Singh</LeaderName>
-              <LeaderRole>Deputy Executive Director</LeaderRole>
-              <LeaderDesc>
-              Atharv supports overall operations, drives program development, and strengthens community engagement.
-              </LeaderDesc>
-              <LeaderLink href="https://www.linkedin.com/in/atharv-singh-b21159369/">Learn More</LeaderLink>
-            </LeadershipCard>
-            <LeadershipCard>
-            <LeaderImg style={{ backgroundImage: 'url("/lily-picture.png")' }} $isColor={true}/>
-              <LeaderName>Lily Yang Liu</LeaderName>
-              <LeaderRole>Deputy Executive Director</LeaderRole>
-              <LeaderDesc>
-              Lily Y. YangLiu is the Deputy Executive Director of the DMUN Foundation, overseeing internal operations and strategic program coordination.
-              </LeaderDesc>
-              <LeaderLink href="https://www.linkedin.com/in/lily-yangliu-9b7471262/">Learn More</LeaderLink>
-            </LeadershipCard>
-           
-          </LeadershipCardsRow>
-        </LeadershipContainer>
-      </LeadershipSection>
-    </BorderedContentWrapper>
-  </>
-);
+            <SectionTitle id="our-philosophy">
+              OUR PHILOSOPHY OF CHANGE
+            </SectionTitle>
+            <p>
+              We create a linear platform to identify, nurture, and support
+              young leaders.
+            </p>
+            <p>
+              All of our programs and initiatives support each other in
+              coherence. We believe that through our philosophy of change, our
+              youth education programs, policy research, and policy advocacy
+              form a trifecta of youth-led leadership and change.
+            </p>
+            <p>
+              • If youth receive the opportunities to learn about global issues,
+              <br />
+              • Then, they will want to create action to address these issues.
+              <br />
+              • If we provide platforms of advocacy for youths willing to take
+              action,
+              <br />
+              • Then, they are able to create meaningful progress.
+              <br />
+              • If this cycle of change continues,
+              <br />
+              • Then, more youths will be involved in creating positive
+              contributions,
+              <br />• As a combined result, the world becomes a better place.
+            </p>
 
-export default About; 
+            <SectionTitle id="annual-reports">Our Annual Reports</SectionTitle>
+            <p>View Our Annual Reports</p>
+            <StyledExternalButton
+              href="https://drive.google.com/drive/folders/1Xe3NVwjf3lCdN7QVOaR2WDlJW-Hxrzfi?usp=share_link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Annual Reports
+            </StyledExternalButton>
+
+            <SectionTitle>Our Milestones</SectionTitle>
+            {/* Placeholder for images as indicated by the user's text */}
+            <p>Our milestones speak louder than words.</p>
+            <p>
+              Throughout our journey, we've proudly set new records and marked
+              historic firsts that reflect our commitment to youth empowerment
+              and innovation. These accomplishments are proof of what's possible
+              when young people lead with purpose.
+            </p>
+            <ul>
+              <li>
+                We operate the world's largest virtual Model UN conference.
+              </li>
+              <li>
+                We are the first organization to nominate people under the age
+                of 18 to participate in 6 UN conferences.
+              </li>
+              <li>
+                Our advocacy eliminated the minimum age requirement in the
+                United Nations Financing for Development Conferences.
+              </li>
+              <li>
+                We are the first youth-led organization to participate as
+                Observer in 3 Intergovernmental Bodies and Organizations. (AHC
+                Tax, OPCW, IPBES)
+              </li>
+              <li>
+                We are the first NGO dedicated in intergovernmental advocacy to
+                have a leadership body comprised of majority people under the
+                age of 18.
+              </li>
+              <br />
+              <br />
+            </ul>
+          </Left>
+          <Right>
+            <SectionTitle id="our-impact">OUR IMPACT IN NUMBERS</SectionTitle>
+
+            <Fact>
+              <strong>26k</strong>
+              <br />
+              Total participants in our program.
+            </Fact>
+            <Fact>
+              <strong>24k</strong>
+              <br />
+              Raised for the Foundation in FY 2024 (in USD)
+            </Fact>
+            <Fact>
+              <strong>161</strong>
+              <br />
+              Countries represented
+            </Fact>
+            <Fact>
+              <strong>37</strong>
+              <br />
+              Intergovernmental bodies and conferences engaged
+            </Fact>
+            <Fact>
+              <strong>32</strong>
+              <br />
+              Inputs, statement, and interventions produced in 2024
+            </Fact>
+            <Fact>
+              <strong>12</strong>
+              <br />
+              Programs operated in 2025
+            </Fact>
+
+            <StyledButton to="/take-action">Take Action</StyledButton>
+          </Right>
+        </Main>
+        <LeadershipSection>
+          <LeadershipContainer>
+            <LeadershipTitleRow>
+              <LeadershipTitle>Leadership</LeadershipTitle>
+              <LeadershipSubtitle>
+                Meet the dedicated individuals who guide our mission and inspire
+                our community.
+              </LeadershipSubtitle>
+            </LeadershipTitleRow>
+            <LeadershipCardsRow>
+              <LeadershipCard>
+                <LeaderImg
+                  style={{ backgroundImage: 'url("/jaewon-picture.jpg")' }}
+                  $isColor={true}
+                />
+                <LeaderName>Jaewon Choi</LeaderName>
+                <LeaderRole>Executive Director</LeaderRole>
+                <LeaderDesc>
+                  Jaewon leads the organization with strategic vision, guiding
+                  its mission and overseeing all key initiatives.
+                </LeaderDesc>
+                <LeaderLink href="https://www.linkedin.com/in/jaewonchoidmun/">
+                  Learn More
+                </LeaderLink>
+              </LeadershipCard>
+              <LeadershipCard>
+                <LeaderImg
+                  style={{
+                    backgroundImage: 'url("/atharv-singh-professional.jpeg")',
+                  }}
+                  $isColor={true}
+                />
+                <LeaderName>Atharv Singh</LeaderName>
+                <LeaderRole>Deputy Executive Director</LeaderRole>
+                <LeaderDesc>
+                  Atharv supports overall operations, drives program
+                  development, and strengthens community engagement.
+                </LeaderDesc>
+                <LeaderLink href="https://www.linkedin.com/in/atharv-singh-b21159369/">
+                  Learn More
+                </LeaderLink>
+              </LeadershipCard>
+              <LeadershipCard>
+                <LeaderImg
+                  style={{ backgroundImage: 'url("/lily-picture.png")' }}
+                  $isColor={true}
+                />
+                <LeaderName>Lily Yang Liu</LeaderName>
+                <LeaderRole>Deputy Executive Director</LeaderRole>
+                <LeaderDesc>
+                  Lily Y. YangLiu is the Deputy Executive Director of the DMUN
+                  Foundation, overseeing internal operations and strategic
+                  program coordination.
+                </LeaderDesc>
+                <LeaderLink href="https://www.linkedin.com/in/lily-yangliu-9b7471262/">
+                  Learn More
+                </LeaderLink>
+              </LeadershipCard>
+            </LeadershipCardsRow>
+          </LeadershipContainer>
+        </LeadershipSection>
+        <ResourceSection>
+          <ResourceContent>
+            <ResourceHeader>Resources</ResourceHeader>
+            <ResourceDescription>
+              Explore our repository of annual reports and documentation to
+              learn more about our initiatives and impact.
+            </ResourceDescription>
+            <StyledExternalButton
+              href="https://drive.google.com/drive/folders/1XIj8ybq9BwQ2zYAj5oyfV-WiNrbVxqQV"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View All Annual Reports
+            </StyledExternalButton>
+          </ResourceContent>
+        </ResourceSection>
+      </BorderedContentWrapper>
+    </>
+  );
+};
+
+export default About;
