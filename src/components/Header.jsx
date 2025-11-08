@@ -1,6 +1,7 @@
 import styled from "styled-components";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import SearchBar from "./search/SearchBar";
 
 const DARK_BLUE = "#002147";
 const ABBOT_BLUE = "#44b8f3";
@@ -32,20 +33,6 @@ const MenuGlyph = () => (
     <line x1="3" y1="8" x2="21" y2="8" />
     <line x1="3" y1="12" x2="21" y2="12" />
     <line x1="3" y1="16" x2="21" y2="16" />
-  </svg>
-);
-
-const SearchGlyph = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-  >
-    <circle cx="11" cy="11" r="7" />
-    <line x1="16.5" y1="16.5" x2="21" y2="21" />
   </svg>
 );
 
@@ -112,66 +99,12 @@ const NavLink = styled(Link)`
 const Right = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
-`;
-
-const SearchToggle = styled.button`
-  background: none;
-  border: none;
-  color: inherit;
-  font-family: var(--andover-font-sans);
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const Search = styled.input`
-  border: none;
-  border-bottom: 1px solid currentColor;
-  background: transparent;
-  color: inherit;
-  font-size: 1rem;
-  padding: 0.2rem 0.5rem;
-  outline: none;
-  width: 200px;
-  &::placeholder {
-    color: currentColor;
-    opacity: 0.8;
-  }
-  &::-webkit-search-decoration,
-  &::-webkit-search-cancel-button,
-  &::-webkit-search-results-button,
-  &::-webkit-search-results-decoration {
-    display: none;
-  }
-  &::-ms-clear {
-    display: none;
-  }
-
-  @media (max-width: 768px) {
-    display: none;
-  }
+  gap: 1.2rem;
 `;
 
 const Header = ({ onMenuClick }) => {
-  const navigate = useNavigate();
   const location = useLocation();
-  const [searchValue, setSearchValue] = useState("");
-  const [showSearch, setShowSearch] = useState(false);
   const [isTransparent, setIsTransparent] = useState(true);
-
-  const handleSearchKeyDown = (e) => {
-    if (e.key === "Enter" && searchValue.trim()) {
-      navigate(`/newsroom?search=${encodeURIComponent(searchValue.trim())}`);
-    }
-  };
 
   const isHome = location.pathname === "/";
 
@@ -215,18 +148,7 @@ const Header = ({ onMenuClick }) => {
         </Navigation>
 
         <Right>
-          {showSearch && (
-            <Search
-              autoFocus
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyDown={handleSearchKeyDown}
-              placeholder="Search..."
-            />
-          )}
-          <SearchToggle onClick={() => setShowSearch((s) => !s)}>
-            <SearchGlyph /> Search
-          </SearchToggle>
+          <SearchBar />
           <NavLink
             as="button"
             onClick={onMenuClick}
