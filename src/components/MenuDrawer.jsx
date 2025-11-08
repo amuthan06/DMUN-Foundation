@@ -1,317 +1,309 @@
-import styled, { keyframes, css } from 'styled-components';
-import { Link, useNavigate } from 'react-router-dom';
-import React from 'react';
+import styled, { keyframes } from "styled-components";
+import { Link } from "react-router-dom";
+import React, { useMemo, useEffect } from "react";
 
 const slideIn = keyframes`
-  from { opacity: 0; transform: translateY(-40px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { transform: translateX(12%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 `;
 
-const DARK_BLUE = '#002147';
-const ABBOT_BLUE = '#44b8f3';
-const SUBNAV_GRAY_TEXT = '#555';
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+const DARK_BLUE = "#002147";
 
 const Overlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   z-index: 2000;
-  display: ${({ open }) => (open ? 'flex' : 'none')};
-  animation: ${slideIn} 0.4s cubic-bezier(0.4,0,0.2,1);
-  font-family: var(--andover-font-serif);
-  background: var(--andover-blue);
-  color: ${DARK_BLUE};
-  overflow-y: hidden; /* prevent double scroll */
-  flex-direction: column; /* so children can flex */
+  display: ${({ open }) => (open ? "flex" : "none")};
+  background: rgba(0, 19, 42, 0.3);
+  backdrop-filter: blur(4px);
+  animation: ${fadeIn} 0.18s ease;
+  justify-content: flex-end;
 `;
 
-const MenuContent = styled.div`
-  width: 100%;
-  padding: 4rem 5vw;
-  max-width: 1600px;
-  margin: 0 auto;
+const Drawer = styled.aside`
+  width: clamp(280px, 30vw, 420px);
+  max-width: 480px;
+  height: 100vh;
+  background: var(--andover-accent);
+  color: ${DARK_BLUE};
   display: flex;
   flex-direction: column;
-  gap: 3rem;
-  flex: 1; /* take all available height */
-  overflow-y: auto; /* scrolling happens here */
-  -webkit-overflow-scrolling: touch; /* iOS momentum scroll */
-
-  @media (max-width: 768px) {
-    padding: 2rem 3vw;
-    gap: 2rem;
-  }
+  box-shadow: 18px 0 40px rgba(0, 0, 0, 0.12);
+  animation: ${slideIn} 0.26s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
-const HeaderSection = styled.div`
+const DrawerHeader = styled.div`
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+  gap: 1rem;
+  padding: 1.6rem clamp(1.6rem, 4vw, 2.2rem) 1.1rem;
 `;
 
-const InstitutionName = styled.h1`
-  font-family: var(--andover-font-serif);
-  font-size: 2rem;
-  font-weight: 700;
-  color: ${DARK_BLUE};
+const BrandBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const BrandTitle = styled.h2`
   margin: 0;
+  font-size: 1.32rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
 `;
 
-const CloseBtn = styled.button`
-  background: none;
+const BrandSubtitle = styled.p`
+  margin: 0;
+  font-family: var(--andover-font-sans);
+  font-size: 0.85rem;
+  line-height: 1.45;
+`;
+
+const CloseButton = styled.button`
   border: none;
+  background: rgba(0, 33, 71, 0.08);
   color: ${DARK_BLUE};
-  font-size: 1.2rem;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.88rem;
   font-family: var(--andover-font-sans);
   font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
   align-items: center;
-  letter-spacing: 0.01em;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: ${DARK_BLUE};
-  }
-`;
-
-const XIcon = styled.span`
-  font-size: 1.5rem;
-  font-weight: bold;
-  line-height: 1;
-  margin-bottom: 0.2rem;
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 3rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 1rem;
-  }
-`;
-
-const ActionButton = styled(Link)`
-  border: 1px solid ${DARK_BLUE};
-  background: none;
-  color: ${DARK_BLUE};
-  border-radius: 25px;
-  padding: 0.75rem 1.5rem;
-  font-size: 1.5rem;
-  font-family: var(--andover-font-serif);
-  font-weight: 400;
+  gap: 0.35rem;
   cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  text-align: center;
+  transition: background 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    background: ${DARK_BLUE};
-    color: var(--andover-blue);
-  }
-    @media (max-width: 768px) {
-  font-size: 1.2rem;
-  padding: 0.6rem 1.2rem;
-}
-`;
-
-const MegaMenuGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 3rem;
-  margin-top: 2rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    background: rgba(0, 33, 71, 0.16);
+    transform: translateY(-2px);
   }
 `;
 
-const MenuSection = styled.div`
+const CloseIcon = styled.span`
+  font-size: 1rem;
+  line-height: 1;
+`;
+
+const DrawerBody = styled.div`
+  flex: 1;
+  padding: 0 clamp(1.6rem, 3.6vw, 2.3rem) clamp(1.8rem, 3.2vw, 2.1rem);
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: clamp(1.35rem, 2.6vw, 2rem);
+  overflow-y: auto;
 `;
 
-const SectionTitle = styled.h3`
+const NavSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+`;
+
+const SectionHeading = styled.h3`
+  margin: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  text-transform: uppercase;
+`;
+
+const LinkList = styled.nav`
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+`;
+
+const NavLink = styled(Link)`
   font-family: var(--andover-font-serif);
   font-size: 1.1rem;
-  font-weight: 700;
-  color: ${DARK_BLUE};
-  margin: 0 0 1rem 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-`;
-
-const MenuLink = styled(Link)`
-  font-family: var(--andover-font-serif);
-  font-size: 2.5rem;
   color: ${DARK_BLUE};
   text-decoration: none;
-  font-weight: 400;
-  padding: 0.3rem 0;
-  line-height: 1.4;
+  line-height: 1.3;
+  transition: transform 0.18s ease, color 0.18s ease;
 
-  &:hover { 
+  &:hover {
+    transform: translateX(4px);
     color: ${DARK_BLUE};
     text-decoration: underline;
   }
-    @media (max-width: 768px) {
-  font-size: 1.8rem; /* for MenuLink */
-}
-  @media (max-width: 480px) {
-  font-size: 1.4rem; /* for MenuLink */
-}
-
 `;
 
-const BottomSection = styled.div`
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+const Divider = styled.div`
+  height: 1px;
+  background: rgba(0, 33, 71, 0.08);
+`;
+
+const ContactBlock = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 1.5rem;
-    text-align: center;
-  }
-`;
-
-const ContactInfo = styled.div`
-  color: ${DARK_BLUE};
+  flex-direction: column;
+  gap: 0.55rem;
   font-family: var(--andover-font-sans);
-  font-size: 0.9rem;
-  line-height: 1.6;
-
-  @media (max-width: 480px) {
   font-size: 0.8rem;
-  word-break: break-word;
-}
+  line-height: 1.45;
 `;
 
-const Socials = styled.div`
-  display: flex;
-  gap: 1.5rem;
+const ContactLabel = styled.span`
+  font-family: var(--andover-font-serif);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-size: 0.78rem;
+  text-transform: uppercase;
 `;
 
-const SocialIcon = styled.span`
-  width: 40px;
-  height: 40px;
-  display: inline-block;
-  background: transparent;
-  border-radius: 50%;
-  color: ${DARK_BLUE};
+const SocialList = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  transition: color 0.2s ease;
+  gap: 0.7rem;
+`;
 
-  &:hover {
-    color: ${ABBOT_BLUE};
-  }
-
-  img {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-  }
-@media (max-width: 480px) {
+const SocialLink = styled.a`
   width: 32px;
   height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 33, 71, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    background: rgba(0, 33, 71, 0.18);
+  }
 
   img {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
-}
-
 `;
 
-const ArrowIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 14" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="butt" strokeLinejoin="miter">
-    <polyline points="2 2 12 12 22 2"></polyline>
-  </svg>
-);
+const menuGroups = [
+  {
+    title: "Discover DMUN",
+    links: [
+      { label: "Home", to: "/" },
+      { label: "About", to: "/about" },
+      { label: "Research", to: "/research" },
+      { label: "Newsroom", to: "/newsroom" },
+      { label: "Publications", to: "/Publications" },
+    ],
+  },
+  {
+    title: "Our Work",
+    links: [
+      { label: "Programs", to: "/programs" },
+      { label: "Advocacy", to: "/advocacy" },
+      { label: "Take Action", to: "/take-action" },
+      { label: "Integrity", to: "/integrity" },
+    ],
+  },
+  {
+    title: "Get Involved",
+    links: [
+      { label: "Volunteer", to: "/volunteer" },
+      { label: "Donate", to: "/donate" },
+      { label: "Partner With Us", to: "/partner" },
+      { label: "Membership", to: "/Membership" },
+      { label: "Donor Relations", to: "/donor-relations" },
+    ],
+  },
+];
 
 const MenuDrawer = ({ open, onClose }) => {
-  const navigate = useNavigate();
+  const handleNavigate = useMemo(
+    () => (to) => () => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      onClose();
+    },
+    [onClose]
+  );
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    if (open) {
+      window.addEventListener("keydown", handleEsc);
+    }
+
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [open, onClose]);
 
   return (
-    <Overlay open={open}>
-      <MenuContent>
-        <HeaderSection>
-          <InstitutionName>DMUN Foundation</InstitutionName>
-          <CloseBtn onClick={onClose}>
-            <XIcon>✕</XIcon>
-            Close
-          </CloseBtn>
-        </HeaderSection>
+    <Overlay open={open} onClick={onClose}>
+      <Drawer onClick={(event) => event.stopPropagation()}>
+        <DrawerHeader>
+          <BrandBlock>
+            <BrandTitle>DMUN Foundation</BrandTitle>
+          </BrandBlock>
+          <CloseButton onClick={onClose}>
+            <CloseIcon>✕</CloseIcon>
+          </CloseButton>
+        </DrawerHeader>
 
-        <ActionButtons>
-          <ActionButton to="/volunteer" onClick={onClose}>Volunteer</ActionButton>
-          <ActionButton to="/donate" onClick={onClose}>Donate</ActionButton>
-          <ActionButton to="/partner" onClick={onClose}>Partner With Us</ActionButton>
-          <ActionButton to="/about" onClick={onClose}>Contact Us</ActionButton>
-        </ActionButtons>
+        <DrawerBody>
+          <Divider />
 
-        <MegaMenuGrid>
-          <MenuSection>
-            <MenuLink to="/" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Home</MenuLink>
-            <MenuLink to="/about" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>About</MenuLink>
-            <MenuLink to="/programs" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Programs</MenuLink>
-            <MenuLink to="/advocacy" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Advocacy</MenuLink>
-            <MenuLink to="/research" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Research</MenuLink>
-          </MenuSection>
+          {menuGroups.map(({ title, links }) => (
+            <NavSection key={title}>
+              <SectionHeading>{title}</SectionHeading>
+              <LinkList>
+                {links.map(({ label, to }) => (
+                  <NavLink key={label} to={to} onClick={handleNavigate(to)}>
+                    {label}
+                  </NavLink>
+                ))}
+              </LinkList>
+            </NavSection>
+          ))}
 
-          <MenuSection>
-            <MenuLink to="/integrity" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Integrity</MenuLink>
-            <MenuLink to="/take-action" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Take Action</MenuLink>
-            <MenuLink to="/newsroom" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Newsroom</MenuLink>
-            <MenuLink to="/donate" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Donate</MenuLink>
-            <MenuLink to="/volunteer" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Volunteer</MenuLink>
-          </MenuSection>
+          <Divider />
 
-          <MenuSection>
-            <MenuLink to="/partner" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Partner</MenuLink>
-            <MenuLink to="/donor-relations" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Donor Relations</MenuLink>
-            <MenuLink to="/mandate" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Our Mission</MenuLink>
-            <MenuLink to="/membership" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Membership</MenuLink>
-            <MenuLink to="/publications" onClick={() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); onClose(); }}>Publications</MenuLink>
-          </MenuSection>
-        </MegaMenuGrid>
-
-        <BottomSection>
-          <ContactInfo>
-            <div>DMUN Foundation</div>
-            <div>4th Floor, 12 Gangnamdaero 156-gil, Seoul, Republic of Korea 06035</div>
-            <div>Unit 1814, 50 Causeway St., Boston, MA, USA 02114</div>
-            <div>enquiries@dmun.org</div>
-            <div>+1 (339) 927 8826 | +82 10 5696 8302</div>
-          </ContactInfo>
-          <Socials>
-            <SocialIcon as="a" href="https://www.instagram.com/discovermun/" target="_blank" rel="noopener noreferrer">
-              <img src="/instagram-icon.png" alt="Instagram" />
-            </SocialIcon>
-            <SocialIcon as="a" href="https://www.linkedin.com/company/dmun-foundation/" target="_blank" rel="noopener noreferrer">
-              <img src="/linkedin-icon.png" alt="LinkedIn" />
-            </SocialIcon>
-            <SocialIcon as="a" href="https://www.youtube.com/@dmunfoundation" target="_blank" rel="noopener noreferrer">
-              <img src="/Youtube-icon.png" alt="YouTube" />
-            </SocialIcon>
-          </Socials>
-        </BottomSection>
-      </MenuContent>
+          <ContactBlock>
+            <ContactLabel>Global Offices</ContactLabel>
+            <span>
+              4th Floor, 12 Gangnamdaero 156-gil, Seoul, Republic of Korea 06035
+            </span>
+            <span>Unit 1814, 50 Causeway St., Boston, MA 02114, USA</span>
+            <span>enquiries@dmun.org</span>
+            <span>+1 (339) 927 8826 · +82 10 5696 8302</span>
+            <SocialList>
+              <SocialLink
+                href="https://www.instagram.com/discovermun/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+              >
+                <img src="/instagram-icon.png" alt="" />
+              </SocialLink>
+              <SocialLink
+                href="https://www.linkedin.com/company/dmun-foundation/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+              >
+                <img src="/linkedin-icon.png" alt="" />
+              </SocialLink>
+              <SocialLink
+                href="https://www.youtube.com/@dmunfoundation"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+              >
+                <img src="/Youtube-icon.png" alt="" />
+              </SocialLink>
+            </SocialList>
+          </ContactBlock>
+        </DrawerBody>
+      </Drawer>
     </Overlay>
   );
 };
